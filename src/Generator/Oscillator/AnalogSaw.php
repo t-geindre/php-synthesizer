@@ -1,11 +1,11 @@
 <?php
 
-namespace Synthesizer\Generator\Wave;
+namespace Synthesizer\Generator\Oscillator;
 
 use Synthesizer\Generator\Generator;
 use Synthesizer\Time\Clock;
 
-class Sinusoidal implements Generator
+class AnalogSaw implements Generator
 {
     private float $angularVelocity;
     private Clock $clock;
@@ -18,7 +18,13 @@ class Sinusoidal implements Generator
 
     public function getValue() : float
     {
-        return sin($this->angularVelocity * $this->clock->getTime());
+        $value = 0;
+
+		for ($i = 1; $i < 20; $i++) {
+			$value += (sin($i * $this->angularVelocity * $this->clock->getTime())) / $i;
+        }
+
+		return $value * (2.0 / pi());
     }
 
     public function isOver(): bool

@@ -1,6 +1,6 @@
 <?php
 
-namespace Synthesizer\Generator\Wave;
+namespace Synthesizer\Generator\Oscillator;
 
 use Synthesizer\Generator\Generator;
 use Synthesizer\Time\Clock;

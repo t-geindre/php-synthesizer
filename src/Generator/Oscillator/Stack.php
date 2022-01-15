@@ -1,10 +1,10 @@
 <?php
 
-namespace Synthesizer\Generator\Wave;
+namespace Synthesizer\Generator\Oscillator;
 
 use Synthesizer\Generator\Generator;
 
-class WaveStack implements Generator
+class Stack implements Generator
 {
     /** @var array<array<Generator, float>> */
     private array $stack;

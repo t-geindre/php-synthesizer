@@ -5,7 +5,7 @@ use Synthesizer\Generator\Effect\Effect;
 use Synthesizer\Generator\Generator;
 use Synthesizer\Generator\Instrument\Utils\Envelope;
 use Synthesizer\Generator\Instrument\Utils\NotesFrequencies;
-use Synthesizer\Generator\Wave\Sinusoidal;
+use Synthesizer\Generator\Oscillator\Sinusoidal;
 use Synthesizer\Time\Clock;
 
 abstract class Instrument

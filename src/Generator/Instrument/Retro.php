@@ -3,16 +3,16 @@
 namespace Synthesizer\Generator\Instrument;
 
 use Synthesizer\Generator\Generator;
-use Synthesizer\Generator\Wave\Sinusoidal;
-use Synthesizer\Generator\Wave\Square;
-use Synthesizer\Generator\Wave\Triangle;
-use Synthesizer\Generator\Wave\WaveStack;
+use Synthesizer\Generator\Oscillator\Sinusoidal;
+use Synthesizer\Generator\Oscillator\Square;
+use Synthesizer\Generator\Oscillator\Triangle;
+use Synthesizer\Generator\Oscillator\Stack;
 
 class Retro extends Instrument
 {
     protected function initializeKey(float $frequency): Generator
     {
-        $stack = new WaveStack();
+        $stack = new Stack();
         $stack->push(new Sinusoidal($frequency * 0.5, $this->clock));
         $stack->push(new Sinusoidal($frequency * 5, $this->clock), 0.6);
         $stack->push(new Square($frequency , $this->clock), 0.5);
