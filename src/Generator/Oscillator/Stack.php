@@ -6,18 +6,18 @@ use Synthesizer\Generator\Generator;
 
 class Stack implements Generator
 {
-    /** @var array<array<Generator, float>> */
+    /** @var array<Generator> */
     private array $stack;
 
-    public function push(Generator $wave, float $amplitude = 1)
+    public function push(Generator $generator)
     {
-        $this->stack[] = [$wave, $amplitude];
+        $this->stack[] = $generator;
     }
 
     public function isOver(): bool
     {
-        foreach ($this->stack as [$wave,]) {
-            if(!$wave->isOver()) {
+        foreach ($this->stack as $generator) {
+            if(!$generator->isOver()) {
                 return false;
             }
         }
@@ -28,7 +28,7 @@ class Stack implements Generator
     public function getValue(): float
     {
         return array_sum(array_map(
-            fn (array $wave) => $wave[0]->getValue() * $wave[1],
+            fn (Generator $generator) => $generator->getValue(),
             $this->stack
         ));
     }

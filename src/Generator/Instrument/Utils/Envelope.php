@@ -77,4 +77,29 @@ class Envelope implements Generator
 
         return $this->generator->getValue() * $amplitude;
     }
+
+    public function setAttackTime(float $attackTime): void
+    {
+        $this->attackTime = $attackTime;
+    }
+
+    public function setDecayTime(float $decayTime): void
+    {
+        $this->decayTime = $decayTime;
+    }
+
+    public function setSustainAmplitude(float $sustainAmplitude): void
+    {
+        $this->sustainAmplitude = $sustainAmplitude;
+    }
+
+    public function setReleaseTime(float $releaseTime): void
+    {
+        $this->releaseTime = $releaseTime;
+    }
+
+    public function setStartAmplitude(float $startAmplitude): void
+    {
+        $this->startAmplitude = $startAmplitude;
+    }
 }
