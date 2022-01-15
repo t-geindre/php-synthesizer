@@ -58,7 +58,7 @@ class Keyboard
         if (!isset($this->keysDown[$key])) {
             $generator = $this->keys[$key];
             foreach ($this->effects as [$class, $config]) {
-                $generator = new $class($generator);
+                $generator = new $class($generator, $this->clock);
             }
             $this->keysDown[$key] = $generator;
         }

@@ -34,6 +34,7 @@ $time = 0;
 
 $clock = new \Synthesizer\Time\Clock(1 / $sampleRate);
 $keyboard = new \Synthesizer\Keyboard(\Synthesizer\Generator\Wave\DigitalSaw::class, $clock);
+$keyboard->addEffect(\Synthesizer\Generator\Effect\Envelope::class);
 foreach ($partition as [$note, $duration]) {
     $sample = $duration / 1000 * $sampleRate;
     $keyboard->keyDown($note);
