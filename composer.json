@@ -1,0 +1,16 @@
+{
+    "name": "tgeindre/synthetiser",
+    "description": "A PHP sound Synthesizer",
+    "autoload": {
+        "psr-4": {
+            "Synthesizer\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Thierry Geindre",
+            "email": "github@nostalgeek.org"
+        }
+    ],
+    "require": {}
+}
