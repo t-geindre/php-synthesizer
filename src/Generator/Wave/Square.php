@@ -7,7 +7,6 @@ use Synthesizer\Time\Clock;
 
 class Square implements Generator
 {
-
     private Generator $generator;
 
     public function __construct(float $frequency, Clock $clock)
@@ -32,6 +31,6 @@ class Square implements Generator
 
     public function getValue(): float
     {
-        return $this->generator->getValue() > 0 ? 1 : 0;
+        return $this->generator->getValue() > 0 ? 1 : -1;
     }
 }

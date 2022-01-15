@@ -35,10 +35,9 @@ class Keyboard
 
     public function getValue() : float
     {
-        $value = 0; $count = 0;
+        $value = 0;
 
         foreach ($this->keysDown as $key => $generator) {
-            $count++;
             $value += $generator->getValue();
 
             if ($generator->isOver()) {
@@ -46,7 +45,7 @@ class Keyboard
             }
         }
 
-        return $value / $count;
+        return $value;
     }
 
     public function isOver() : bool

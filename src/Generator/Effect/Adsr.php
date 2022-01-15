@@ -3,11 +3,17 @@
 namespace Synthesizer\Generator\Effect;
 
 use Synthesizer\Generator\Generator;
+use Synthesizer\Time\Clock;
 
 class Adsr implements Effect
 {
-    public function __construct(Generator $generator, int $sampleRate)
+    private Generator $generator;
+    private Clock $clock;
+
+    public function __construct(Generator $generator, Clock $clock)
     {
+        $this->generator = $generator;
+        $this->clock = $clock;
     }
 
     public function configure(array $config): void

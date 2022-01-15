@@ -2,7 +2,7 @@
 require(__DIR__.'/../vendor/autoload.php');
 
 $sampleRate = 44100;
-$amplitude = 0.25 * 32768;
+$amplitude = 0.6 * 32768;
 
 
 $partition = [
@@ -33,13 +33,13 @@ $samples = array();
 $time = 0;
 
 $clock = new \Synthesizer\Time\Clock(1 / $sampleRate);
-$keyboard = new \Synthesizer\Keyboard(\Synthesizer\Generator\Wave\Square::class, $clock);
+$keyboard = new \Synthesizer\Keyboard(\Synthesizer\Generator\Wave\DigitalSaw::class, $clock);
 foreach ($partition as [$note, $duration]) {
     $sample = $duration / 1000 * $sampleRate;
     $keyboard->keyDown($note);
     while($sample-- > 0) {
         $clock->tick();
-        $samples[] = (int)($keyboard->getValue()) * $amplitude;
+        $samples[] = (int)($keyboard->getValue() * $amplitude);
     }
     $keyboard->keyUp($note);
 }
