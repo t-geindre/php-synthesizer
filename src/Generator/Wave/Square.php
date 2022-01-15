@@ -3,15 +3,16 @@
 namespace Synthesizer\Generator\Wave;
 
 use Synthesizer\Generator\Generator;
+use Synthesizer\Time\Clock;
 
 class Square implements Generator
 {
 
     private Generator $generator;
 
-    public function __construct(float $frequency, int $sampleRate)
+    public function __construct(float $frequency, Clock $clock)
     {
-        $this->generator = new Sinusoidal($frequency, $sampleRate);
+        $this->generator = new Sinusoidal($frequency, $clock);
     }
 
     public function start(): void

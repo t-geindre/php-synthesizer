@@ -2,11 +2,8 @@
 require(__DIR__.'/../vendor/autoload.php');
 
 $sampleRate = 44100;
-$amplitude = 0.60 * 32768;
+$amplitude = 0.25 * 32768;
 
-$keyboard = new \Synthesizer\Keyboard($sampleRate, $amplitude, \Synthesizer\Generator\Wave\Sinusoidal::class);
-$keyboard->addEffect(\Synthesizer\Generator\Effect\Attack::class);
-$keyboard->addEffect(\Synthesizer\Generator\Effect\FadeOut::class);
 
 $partition = [
     ['E4', 400],
@@ -33,11 +30,16 @@ $partition = [
 $samplesCount = array_sum(array_column($partition, '1')) * $sampleRate;
 
 $samples = array();
+$time = 0;
+
+$clock = new \Synthesizer\Time\Clock(1 / $sampleRate);
+$keyboard = new \Synthesizer\Keyboard(\Synthesizer\Generator\Wave\Square::class, $clock);
 foreach ($partition as [$note, $duration]) {
     $sample = $duration / 1000 * $sampleRate;
     $keyboard->keyDown($note);
     while($sample-- > 0) {
-        $samples[] = (int)($keyboard->getValue());
+        $clock->tick();
+        $samples[] = (int)($keyboard->getValue()) * $amplitude;
     }
     $keyboard->keyUp($note);
 }
@@ -45,6 +47,7 @@ foreach ($partition as [$note, $duration]) {
 // Due to effects, the keyboard might have remaining sound to play
 $keyboard->keyUpAll();
 while (!$keyboard->isOver()) {
+    $clock->tick();
     $samples[] = (int)($keyboard->getValue());
 }
 

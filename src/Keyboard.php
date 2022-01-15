@@ -3,24 +3,23 @@ namespace Synthesizer;
 
 use Synthesizer\Generator\Effect\Effect;
 use Synthesizer\Generator\Wave\Sinusoidal;
+use Synthesizer\Time\Clock;
 
 class Keyboard
 {
     /** @var array<Sinusoidal>  */
     private array $keys;
-    private int $sampleRate;
     /** @var array<Effect> */
     private array $keysDown = [];
-    private int $amplitude;
     /** @var array<string, array> */
     private array $effects = [];
     private string $waveClass;
+    private Clock $clock;
 
-    public function __construct(int $sampleRate, int $amplitude = 1, $waveClass = Sinusoidal::class)
+    public function __construct($waveClass, Clock $clock)
     {
-        $this->sampleRate = $sampleRate;
-        $this->amplitude = $amplitude;
         $this->waveClass = $waveClass;
+        $this->clock = $clock;
 
         $this->initializeKeys();
     }
@@ -47,7 +46,7 @@ class Keyboard
             }
         }
 
-        return $value / $count  * $this->amplitude;
+        return $value / $count;
     }
 
     public function isOver() : bool
@@ -60,7 +59,7 @@ class Keyboard
         if (!isset($this->keysDown[$key])) {
             $generator = $this->keys[$key];
             foreach ($this->effects as [$class, $config]) {
-                $generator = new $class($generator, $this->sampleRate);
+                $generator = new $class($generator);
             }
             $this->keysDown[$key] = $generator;
         }
@@ -80,70 +79,18 @@ class Keyboard
     }
 
     private function initializeKeys() {
-        $this->keys = [
-            'C0' => new $this->waveClass(16.35, $this->sampleRate),
-            'D0' => new $this->waveClass(18.35, $this->sampleRate),
-            'E0' => new $this->waveClass(20.60, $this->sampleRate),
-            'F0' => new $this->waveClass(21.83, $this->sampleRate),
-            'G0' => new $this->waveClass(24.50, $this->sampleRate),
-            'A0' => new $this->waveClass(27.50, $this->sampleRate),
-            'B0' => new $this->waveClass(30.87, $this->sampleRate),
-            'C1' => new $this->waveClass(32.70, $this->sampleRate),
-            'D1' => new $this->waveClass(36.71, $this->sampleRate),
-            'E1' => new $this->waveClass(41.20, $this->sampleRate),
-            'F1' => new $this->waveClass(43.65, $this->sampleRate),
-            'G1' => new $this->waveClass(49.00, $this->sampleRate),
-            'A1' => new $this->waveClass(55.00, $this->sampleRate),
-            'B1' => new $this->waveClass(61.74, $this->sampleRate),
-            'C2' => new $this->waveClass(65.41, $this->sampleRate),
-            'D2' => new $this->waveClass(73.42, $this->sampleRate),
-            'E2' => new $this->waveClass(82.41, $this->sampleRate),
-            'F2' => new $this->waveClass(87.31, $this->sampleRate),
-            'G2' => new $this->waveClass(98.00, $this->sampleRate),
-            'A2' => new $this->waveClass(110.00, $this->sampleRate),
-            'B2' => new $this->waveClass(123.47, $this->sampleRate),
-            'C3' => new $this->waveClass(130.81, $this->sampleRate),
-            'D3' => new $this->waveClass(146.83, $this->sampleRate),
-            'E3' => new $this->waveClass(164.81, $this->sampleRate),
-            'F3' => new $this->waveClass(174.61, $this->sampleRate),
-            'G3' => new $this->waveClass(196.00, $this->sampleRate),
-            'A3' => new $this->waveClass(220.00, $this->sampleRate),
-            'B3' => new $this->waveClass(246.94, $this->sampleRate),
-            'C4' => new $this->waveClass(261.63, $this->sampleRate),
-            'D4' => new $this->waveClass(293.66, $this->sampleRate),
-            'E4' => new $this->waveClass(329.63, $this->sampleRate),
-            'F4' => new $this->waveClass(349.23, $this->sampleRate),
-            'G4' => new $this->waveClass(392.00, $this->sampleRate),
-            'A4' => new $this->waveClass(440.00, $this->sampleRate),
-            'B4' => new $this->waveClass(493.88, $this->sampleRate),
-            'C5' => new $this->waveClass(523.25, $this->sampleRate),
-            'D5' => new $this->waveClass(587.33, $this->sampleRate),
-            'E5' => new $this->waveClass(659.25, $this->sampleRate),
-            'F5' => new $this->waveClass(698.46, $this->sampleRate),
-            'G5' => new $this->waveClass(783.99, $this->sampleRate),
-            'A5' => new $this->waveClass(880.00, $this->sampleRate),
-            'B5' => new $this->waveClass(987.77, $this->sampleRate),
-            'C6' => new $this->waveClass(1046.50, $this->sampleRate),
-            'D6' => new $this->waveClass(1174.66, $this->sampleRate),
-            'E6' => new $this->waveClass(1318.51, $this->sampleRate),
-            'F6' => new $this->waveClass(1396.91, $this->sampleRate),
-            'G6' => new $this->waveClass(1567.98, $this->sampleRate),
-            'A6' => new $this->waveClass(1760.00, $this->sampleRate),
-            'B6' => new $this->waveClass(1975.53, $this->sampleRate),
-            'C7' => new $this->waveClass(2093.00, $this->sampleRate),
-            'D7' => new $this->waveClass(2349.32, $this->sampleRate),
-            'E7' => new $this->waveClass(2637.02, $this->sampleRate),
-            'F7' => new $this->waveClass(2793.83, $this->sampleRate),
-            'G7' => new $this->waveClass(3135.96, $this->sampleRate),
-            'A7' => new $this->waveClass(3520.00, $this->sampleRate),
-            'B7' => new $this->waveClass(3951.07, $this->sampleRate),
-            'C8' => new $this->waveClass(4186.01, $this->sampleRate),
-            'D8' => new $this->waveClass(4698.63, $this->sampleRate),
-            'E8' => new $this->waveClass(5274.04, $this->sampleRate),
-            'F8' => new $this->waveClass(5587.65, $this->sampleRate),
-            'G8' => new $this->waveClass(6271.93, $this->sampleRate),
-            'A8' => new $this->waveClass(7040.00, $this->sampleRate),
-            'B8' => new $this->waveClass(7902.13, $this->sampleRate),
-        ];
+        foreach ([
+            'C0' => 16.35, 'D0' => 18.35, 'E0' => 20.60, 'F0' => 21.83, 'G0' => 24.50, 'A0' => 27.50, 'B0' => 30.87,
+            'C1' => 32.70, 'D1' => 36.71, 'E1' => 41.20, 'F1' => 43.65, 'G1' => 49.00, 'A1' => 55.00, 'B1' => 61.74,
+            'C2' => 65.41, 'D2' => 73.42, 'E2' => 82.41, 'F2' => 87.31, 'G2' => 98.00, 'A2' => 110.00, 'B2' => 123.47,
+            'C3' => 130.81, 'D3' => 146.83, 'E3' => 164.81, 'F3' => 174.61, 'G3' => 196.00, 'A3' => 220.00, 'B3' => 246.94,
+            'C4' => 261.63, 'D4' => 293.66, 'E4' => 329.63, 'F4' => 349.23, 'G4' => 392.00, 'A4' => 440.00, 'B4' => 493.88,
+            'C5' => 523.25, 'D5' => 587.33, 'E5' => 659.25, 'F5' => 698.46, 'G5' => 783.99, 'A5' => 880.00, 'B5' => 987.77,
+            'C6' => 1046.50, 'D6' => 1174.66, 'E6' => 1318.51, 'F6' => 1396.91, 'G6' => 1567.98, 'A6' => 1760.00, 'B6' => 1975.53,
+            'C7' => 2093.00, 'D7' => 2349.32, 'E7' => 2637.02, 'F7' => 2793.83, 'G7' => 3135.96, 'A7' => 3520.00, 'B7' => 3951.07,
+            'C8' => 4186.01, 'D8' => 4698.63, 'E8' => 5274.04, 'F8' => 5587.65, 'G8' => 6271.93, 'A8' => 7040.00, 'B8' => 7902.13,
+        ] as $key => $frequency) {
+            $this->keys[$key] = new $this->waveClass($frequency, $this->clock);
+        }
     }
 }

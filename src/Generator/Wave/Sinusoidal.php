@@ -2,22 +2,23 @@
 
 namespace Synthesizer\Generator\Wave;
 
-use Synthesizer\Generator\Generator;
+use Synthesizer\Time\Clock;
 
-class Sinusoidal implements Generator
+class Sinusoidal implements Wave
 {
     private float $angularVelocity;
-    private int $sample = 1;
     private bool $isStopped = false;
+    private Clock $clock;
 
-    public function __construct(float $frequency, int $sampleRate)
+    public function __construct(float $frequency, Clock $clock)
     {
-        $this->angularVelocity = 2 * pi() * $frequency / $sampleRate;
+        $this->angularVelocity = 2 * pi() * $frequency;
+        $this->clock = $clock;
     }
 
     public function getValue() : float
     {
-        return sin($this->sample++ * $this->angularVelocity);
+        return sin($this->angularVelocity * $this->clock->getTime());
     }
 
     public function start(): void
