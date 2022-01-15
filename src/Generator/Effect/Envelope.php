@@ -9,9 +9,9 @@ class Envelope implements Effect
 {
     private Generator $generator;
     private Clock $clock;
-    private float $attackTime = 0.10;
+    private float $attackTime = 0.150;
 	private float $decayTime = 0.10;
-	private float $sustainAmplitude = 0.4;
+	private float $sustainAmplitude = 0.8;
 	private float $releaseTime = 0.02;
 	private float $startAmplitude = 1.0;
 	private float $triggerOffTime = 0.0;
