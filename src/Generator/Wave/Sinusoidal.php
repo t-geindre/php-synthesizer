@@ -6,18 +6,18 @@ use Synthesizer\Generator\Generator;
 
 class Sinusoidal implements Generator
 {
-    private float $wave;
+    private float $angularVelocity;
     private int $sample = 1;
     private bool $isStopped = false;
 
     public function __construct(float $frequency, int $sampleRate)
     {
-        $this->wave = 2 * pi() * $frequency / $sampleRate;
+        $this->angularVelocity = 2 * pi() * $frequency / $sampleRate;
     }
 
     public function getValue() : float
     {
-        return sin($this->sample++ * $this->wave);
+        return sin($this->sample++ * $this->angularVelocity);
     }
 
     public function start(): void
