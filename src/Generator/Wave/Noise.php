@@ -2,19 +2,10 @@
 
 namespace Synthesizer\Generator\Wave;
 
-use Synthesizer\Time\Clock;
+use Synthesizer\Generator\Generator;
 
-class Noise implements Wave
+class Noise implements Generator
 {
-
-    public function start(): void
-    {
-    }
-
-    public function stop(): void
-    {
-    }
-
     public function isOver(): bool
     {
         return true;
@@ -23,9 +14,5 @@ class Noise implements Wave
     public function getValue(): float
     {
         return mt_rand(0, 1000) / 1000;
-    }
-
-    public function __construct(float $frequency, Clock $clock)
-    {
     }
 }

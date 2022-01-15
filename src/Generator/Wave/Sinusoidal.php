@@ -2,12 +2,12 @@
 
 namespace Synthesizer\Generator\Wave;
 
+use Synthesizer\Generator\Generator;
 use Synthesizer\Time\Clock;
 
-class Sinusoidal implements Wave
+class Sinusoidal implements Generator
 {
     private float $angularVelocity;
-    private bool $isStopped = false;
     private Clock $clock;
 
     public function __construct(float $frequency, Clock $clock)
@@ -21,18 +21,8 @@ class Sinusoidal implements Wave
         return sin($this->angularVelocity * $this->clock->getTime());
     }
 
-    public function start(): void
-    {
-        $this->isStopped = false;
-    }
-
-    public function stop(): void
-    {
-        $this->isStopped = true;
-    }
-
     public function isOver(): bool
     {
-        return $this->isStopped;
+        return true;
     }
 }

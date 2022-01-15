@@ -1,11 +1,11 @@
 <?php
 
-namespace Synthesizer\Generator\Effect;
+namespace Synthesizer\Generator\Instrument\Utils;
 
 use Synthesizer\Generator\Generator;
 use Synthesizer\Time\Clock;
 
-class Envelope implements Effect
+class Envelope implements Generator
 {
     private Generator $generator;
     private Clock $clock;
@@ -25,11 +25,7 @@ class Envelope implements Effect
         $this->clock = $clock;
     }
 
-    public function configure(array $config): void
-    {
-    }
-
-    public function start(): void
+    public function noteOn(): void
     {
         $this->isOn = true;
         $this->isOver = false;
@@ -37,7 +33,7 @@ class Envelope implements Effect
         $this->triggerOnTime = $this->clock->getTime();
     }
 
-    public function stop(): void
+    public function noteOff(): void
     {
         $this->triggerOffTime = $this->clock->getTime();
         $this->isOn = false;

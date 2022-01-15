@@ -2,34 +2,16 @@
 
 namespace Synthesizer\Generator\Wave;
 
-use Synthesizer\Time\Clock;
+use Synthesizer\Generator\Generator;
 
-class WaveStack implements Wave
+class WaveStack implements Generator
 {
-    /** @var array<array<Wave, float>> */
+    /** @var array<array<Generator, float>> */
     private array $stack;
 
-    public function __construct(float $frequency, Clock $clock)
-    {
-    }
-
-    public function push(Wave $wave, float $amplitude = 1)
+    public function push(Generator $wave, float $amplitude = 1)
     {
         $this->stack[] = [$wave, $amplitude];
-    }
-
-    public function start(): void
-    {
-        foreach ($this->stack as [$wave,]) {
-            $wave->start();
-        }
-    }
-
-    public function stop(): void
-    {
-        foreach ($this->stack as [$wave,]) {
-            $wave->stop();
-        }
     }
 
     public function isOver(): bool

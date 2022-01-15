@@ -3,15 +3,16 @@ namespace Synthesizer\Generator\Instrument;
 
 use Synthesizer\Generator\Effect\Effect;
 use Synthesizer\Generator\Generator;
+use Synthesizer\Generator\Instrument\Utils\Envelope;
 use Synthesizer\Generator\Instrument\Utils\NotesFrequencies;
 use Synthesizer\Generator\Wave\Sinusoidal;
 use Synthesizer\Time\Clock;
 
-abstract class Keyboard
+abstract class Instrument
 {
     /** @var array<Sinusoidal>  */
     private array $keys;
-    /** @var array<Effect> */
+    /** @var array<Envelope> */
     private array $keysDown = [];
     /** @var array<string, array> */
     protected Clock $clock;
@@ -46,14 +47,14 @@ abstract class Keyboard
     public function keyDown(string $key) : void
     {
         if (!isset($this->keysDown[$key])) {
-            $this->keysDown[$key] = $this->initializeNote($this->keys[$key]);
+            $this->keysDown[$key] = $this->getEnvelope($this->keys[$key]);
         }
-        $this->keysDown[$key]->start();
+        $this->keysDown[$key]->noteOn();
     }
 
     public function keyUp(string $key) : void
     {
-        $this->keysDown[$key]->stop();
+        $this->keysDown[$key]->noteOff();
     }
 
     public function keyUpAll() : void
@@ -69,6 +70,10 @@ abstract class Keyboard
         }
     }
 
+    protected function getEnvelope(Generator $generator) : Envelope
+    {
+        return new Envelope($generator, $this->clock);
+    }
+
     protected abstract function initializeKey(float $frequency) : Generator;
-    protected abstract function initializeNote(Generator $generator) : Generator;
 }

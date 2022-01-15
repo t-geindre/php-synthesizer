@@ -33,7 +33,7 @@ $samples = array();
 $time = 0;
 
 $clock = new \Synthesizer\Time\Clock(1 / $sampleRate);
-$keyboard = new \Synthesizer\Generator\Instrument\RetroKeyboard($clock);
+$keyboard = new \Synthesizer\Generator\Instrument\Retro($clock);
 foreach ($partition as [$note, $duration]) {
     $sample = $duration / 1000 * $sampleRate;
     $keyboard->keyDown($note);
