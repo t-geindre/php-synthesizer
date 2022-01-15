@@ -2,7 +2,7 @@
 require(__DIR__.'/../vendor/autoload.php');
 
 $sampleRate = 44100;
-$amplitude = 0.6 * 32768;
+$amplitude = 0.25 * 32768;
 
 
 $partition = [
