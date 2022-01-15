@@ -5,7 +5,7 @@ namespace Synthesizer\Generator\Wave;
 use Synthesizer\Generator\Generator;
 use Synthesizer\Time\Clock;
 
-class Square implements Generator
+class Square implements Wave
 {
     private Generator $generator;
 
