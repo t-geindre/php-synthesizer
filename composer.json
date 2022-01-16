@@ -12,5 +12,7 @@
             "email": "github@nostalgeek.org"
         }
     ],
-    "require": {}
+    "require-dev": {
+        "phpstan/phpstan": "^1.4"
+    }
 }
