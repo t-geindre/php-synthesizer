@@ -15,9 +15,16 @@ class Arranger implements Generator
         $this->amplitude = $amplitude;
     }
 
-    public function addTrack(Track $track)
+    public function addTrack(Track $track): void
     {
         $this->tracks[] = $track;
+    }
+
+    public function addTracks(array $tracks) : void
+    {
+        foreach ($tracks as $track) {
+            $this->addTrack($track);
+        }
     }
 
     public function isOver(): bool

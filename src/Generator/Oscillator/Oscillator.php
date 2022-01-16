@@ -12,6 +12,7 @@ class Oscillator implements Generator
     private float $amplitude;
     private int $shape;
     private ?Oscillator $lfo = null;
+    private float $lastValue = 0;
 
     const SHAPE_ANALOGIC_SAW = 1;
     const SHAPE_DIGITAL_SAW = 2;
@@ -35,7 +36,7 @@ class Oscillator implements Generator
 
     public function getValue() : float
     {
-        return call_user_func([$this, [
+        $this->lastValue = call_user_func([$this, [
             self::SHAPE_ANALOGIC_SAW => 'getAnalogicSawValue',
             self::SHAPE_DIGITAL_SAW => 'getDigitalSawValue',
             self::SHAPE_NOISE => 'getNoiseValue',
@@ -43,6 +44,7 @@ class Oscillator implements Generator
             self::SHAPE_TRIANGLE => 'getTriangleValue',
         ][$this->shape] ?? 'getSinusoidalValue']) * $this->getAmplitude();
 
+        return $this->lastValue;
     }
 
     private function getCurrentAngle() : float
@@ -97,7 +99,14 @@ class Oscillator implements Generator
 
     public function isOver(): bool
     {
-        return true;
+        switch($this->shape) {
+            case self::SHAPE_ANALOGIC_SAW:
+            case self::SHAPE_DIGITAL_SAW:
+            case self::SHAPE_TRIANGLE:
+                return $this->lastValue < 0.001 && $this->lastValue > -0.999;
+            default:
+                return true;
+        }
     }
 
     public function getFrequency(): float

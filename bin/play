@@ -1,0 +1,40 @@
+#!/usr/bin/env php
+<?php
+require(__DIR__.'/../vendor/autoload.php');
+
+use Synthesizer\Generator\Arranger\Arranger;
+use Synthesizer\Output\Wave;
+
+const MAX_AMPLITUDE = 32768;
+
+function error($msg) : void
+{
+    $stderr = fopen('php://stderr', 'w');
+    fwrite($stderr, $msg."\n");
+    fclose($stderr);
+    exit(1);
+}
+
+if ($argc !== 2) {
+    error('Please provide song to play as first argument');
+}
+
+if (!file_exists($songFile = __DIR__.'/songs/'.strtolower($argv[1]).'.php')) {
+    error(sprintf('Unknown song %s', $argv[1]));
+}
+
+$output = new Wave();
+$clock = $output->getClock();
+
+$arranger = new Arranger(0.25 * MAX_AMPLITUDE);
+$arranger->addTracks(require($songFile));
+
+while(!$arranger->isOver()) {
+    try {
+        $output->addSample((int) $arranger->getValue());
+    } catch (\InvalidArgumentException $e) {
+        error($e->getMessage());
+    }
+}
+
+$output->flush();

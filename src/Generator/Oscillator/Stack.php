@@ -8,6 +8,7 @@ class Stack implements Generator
 {
     /** @var array<Generator> */
     private array $stack;
+    private float $lastValue = 0;
 
     public function push(Generator $generator)
     {
@@ -16,20 +17,16 @@ class Stack implements Generator
 
     public function isOver(): bool
     {
-        foreach ($this->stack as $generator) {
-            if(!$generator->isOver()) {
-                return false;
-            }
-        }
-
-        return true;
+        return $this->lastValue < 0.0001 && $this->lastValue > -0.9999;
     }
 
     public function getValue(): float
     {
-        return array_sum(array_map(
+        $this->lastValue = array_sum(array_map(
             fn (Generator $generator) => $generator->getValue(),
             $this->stack
         ));
+
+        return $this->lastValue;
     }
 }

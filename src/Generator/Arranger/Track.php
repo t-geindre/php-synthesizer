@@ -13,6 +13,7 @@ class Track implements Generator
     /** @var array<array<int, Clip>> */
     private array $clips = [];
     private ?Clip $playingClip = null;
+    private int $playingClipAt = 0;
     private $playingNotes = [];
     private float $amplitude;
 
@@ -39,6 +40,7 @@ class Track implements Generator
 
         foreach ($this->clips as $at => $clip) {
             if ($at / 1000.0 < $time) {
+                $this->playingClipAt = $at;
                 $this->playingClip = $clip;
                 unset($this->clips[$at]);
             }
@@ -48,7 +50,8 @@ class Track implements Generator
             if ($this->playingClip->isOver()) {
                 $this->playingClip = null;
             } else {
-                foreach ($this->playingClip->getNotes($time) as [$note, $duration]) {
+                $notes = $this->playingClip->getNotes($time - $this->playingClipAt / 1000);
+                foreach ($notes as [$note, $duration]) {
                     if (isset($this->playingNotes[$note])) {
                         $this->instrument->keyUp($note);
                     }

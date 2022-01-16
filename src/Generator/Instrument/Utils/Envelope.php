@@ -16,7 +16,6 @@ class Envelope implements Generator
 	private float $startAmplitude = 1.0;
 	private float $triggerOffTime = 0.0;
 	private float $triggerOnTime = 0.0;
-	private bool $isOn = false;
 	private bool $isOver = false;
 
     public function __construct(Generator $generator, Clock $clock)
@@ -27,52 +26,63 @@ class Envelope implements Generator
 
     public function noteOn(): void
     {
-        $this->isOn = true;
         $this->isOver = false;
-
         $this->triggerOnTime = $this->clock->getTime();
+        $this->triggerOffTime = 0;
     }
 
     public function noteOff(): void
     {
         $this->triggerOffTime = $this->clock->getTime();
-        $this->isOn = false;
     }
 
     public function isOver(): bool
     {
-        return $this->isOver;
+        return $this->generator->isOver() && $this->isOver;
     }
 
     public function getValue(): float
     {
         $amplitude = 0.0;
+        $releaseAmplitude = 0.0;
         $time = $this->clock->getTime();
-        $lifeTime = $time - $this->triggerOnTime;
+        $isOn = $this->triggerOnTime > $this->triggerOffTime;
 
-        if ($this->isOn) {
-            if ($lifeTime <= $this->attackTime) {
+        if ($isOn) // Note is on
+        {
+            $lifeTime = $time - $this->triggerOnTime;
+
+            if ($lifeTime <= $this->attackTime)
                 $amplitude = ($lifeTime / $this->attackTime) * $this->startAmplitude;
-            }
 
-            if ($lifeTime > $this->attackTime && $lifeTime <= ($this->attackTime + $this->decayTime)) {
-                // In decay phase - reduce to sustained amplitude
+            if ($lifeTime > $this->attackTime && $lifeTime <= ($this->attackTime + $this->decayTime))
                 $amplitude = (($lifeTime - $this->attackTime) / $this->decayTime) * ($this->sustainAmplitude - $this->startAmplitude) + $this->startAmplitude;
-            }
 
-            if ($lifeTime > ($this->attackTime + $this->decayTime)) {
-                // In sustain phase - dont change until note released
+            if ($lifeTime > ($this->attackTime + $this->decayTime))
                 $amplitude = $this->sustainAmplitude;
-            }
-        } else {
-            // Note has been released, so in release phase
-            $amplitude = (($time - $this->triggerOffTime) / $this->releaseTime) * (0.0 - $this->sustainAmplitude) + $this->sustainAmplitude;
+        }
+        else // Note is off
+        {
+            $lifeTime = $this->triggerOffTime - $this->triggerOnTime;
+
+            if ($lifeTime <= $this->attackTime)
+                $releaseAmplitude = ($lifeTime / $this->attackTime) * $this->startAmplitude;
+
+            if ($lifeTime > $this->attackTime && $lifeTime <= ($this->attackTime + $this->decayTime))
+                $releaseAmplitude = (($lifeTime - $this->attackTime) / $this->decayTime) * ($this->sustainAmplitude - $this->startAmplitude) + $this->startAmplitude;
+
+            if ($lifeTime > ($this->attackTime + $this->decayTime))
+                $releaseAmplitude = $this->sustainAmplitude;
+
+            $amplitude = (($time - $this->triggerOffTime) / $this->releaseTime) * (0.0 - $releaseAmplitude) + $releaseAmplitude;
         }
 
         // Amplitude should not be negative
-        if ($amplitude < 0) {
-            $this->isOver = true;
+        if ($amplitude <= 0.01) {
             $amplitude = 0.0;
+            if (!$isOn) {
+                $this->isOver = true;
+            }
         }
 
         return $this->generator->getValue() * $amplitude;

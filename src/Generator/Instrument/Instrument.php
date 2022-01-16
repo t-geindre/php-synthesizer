@@ -16,6 +16,8 @@ abstract class Instrument
     private array $keysDown = [];
     /** @var array<string, array> */
     protected Clock $clock;
+    /** @var array<Envelope> */
+    protected array $keysReleased = [];
 
     public function __construct(Clock $clock)
     {
@@ -36,25 +38,46 @@ abstract class Instrument
             }
         }
 
+        foreach ($this->keysReleased as $key => $generator) {
+            $value += $generator->getValue();
+
+            if ($generator->isOver()) {
+                unset($this->keysReleased[$key]);
+            }
+        }
+
         return $value;
     }
 
     public function isOver() : bool
     {
-        return count($this->keysDown) == 0;
+        return count($this->keysDown) + count($this->keysReleased) == 0;
     }
 
     public function keyDown(string $key) : void
     {
-        if (!isset($this->keysDown[$key])) {
-            $this->keysDown[$key] = $this->getEnvelope($this->keys[$key]);
+        if (!isset($this->keys[$key])) {
+            throw new \InvalidArgumentException(sprintf('Unknown note "%s"', $key));
         }
+
+        if (isset($this->keysDown[$key])) {
+            $this->keyUp($key);;
+        }
+
+        $this->keysDown[$key] = $this->getEnvelope($this->keys[$key]);
         $this->keysDown[$key]->noteOn();
     }
 
     public function keyUp(string $key) : void
     {
+        if (!isset($this->keysDown[$key])) {
+            return;
+        }
+
         $this->keysDown[$key]->noteOff();
+        $this->keysReleased[] = $this->keysDown[$key];
+
+        unset($this->keysDown[$key]);
     }
 
     public function keyUpAll() : void
