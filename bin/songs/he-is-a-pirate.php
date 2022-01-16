@@ -1,12 +1,13 @@
 <?php
-use Synthesizer\Generator\Arranger\Track;
-use Synthesizer\Generator\Arranger\SequentialClip;
+
 use Synthesizer\Generator\Arranger\Clip;
-use Synthesizer\Generator\Instrument\Retro;
+use Synthesizer\Generator\Arranger\SequentialClip;
+use Synthesizer\Generator\Arranger\Track;
 use Synthesizer\Generator\Instrument\Piano;
+use Synthesizer\Generator\Instrument\Retro;
 
 /** @var \Synthesizer\Time\Clock $clock*/
-$melodyTrack = new Track(new Piano($clock), $clock, 1);
+$melodyTrack = new Track(new Retro($clock), $clock, 1);
 $melodyTrack->addClip(0, new SequentialClip([
     ['D4', 400],
     ['E4', 400],
