@@ -46,7 +46,7 @@ $track->addClip(0, new SequentialClip($partition));
 $tracks[] = $track;
 
 $track = new Track(new Bell($clock), $clock);
-$track->addClip($partitionLength, new SequentialClip($partition));
+$track->addClip($partitionLength + 100, new SequentialClip($partition));
 $tracks[] = $track;
 
 return $tracks;
