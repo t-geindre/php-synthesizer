@@ -10,11 +10,12 @@ class Track implements Generator
 {
     private Instrument $instrument;
     private Clock $clock;
-    /** @var array<array<int, Clip>> */
+    /** @var array<int, Clip> */
     private array $clips = [];
     private ?Clip $playingClip = null;
     private int $playingClipAt = 0;
-    private $playingNotes = [];
+    /** @var array<string, float> */
+    private array $playingNotes = [];
     private float $amplitude;
 
     public function __construct(Instrument $instrument, Clock $clock, float $amplitude = 1)
@@ -24,7 +25,7 @@ class Track implements Generator
         $this->amplitude = $amplitude;
     }
 
-    public function addClip(int $at, Clip $clip)
+    public function addClip(int $at, Clip $clip) : void
     {
         $this->clips[$at] = $clip;
     }
@@ -51,6 +52,7 @@ class Track implements Generator
                 $this->playingClip = null;
             } else {
                 $notes = $this->playingClip->getNotes($time - $this->playingClipAt / 1000);
+                /** @var string $note */
                 foreach ($notes as [$note, $duration]) {
                     if (isset($this->playingNotes[$note])) {
                         $this->instrument->keyUp($note);

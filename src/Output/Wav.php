@@ -21,7 +21,7 @@ class Wav
         return $this->clock;
     }
 
-    public function addSample(int $sample)
+    public function addSample(int $sample) : void
     {
         $this->write('v', $sample);
         $this->clock->tick();
@@ -49,7 +49,10 @@ class Wav
         );
     }
 
-    private function write(string $format, ...$data)
+    /**
+     * @param mixed ...$data
+     */
+    private function write(string $format, ...$data) : void
     {
         echo pack($format, ...$data);
     }

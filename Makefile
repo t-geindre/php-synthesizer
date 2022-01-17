@@ -1,5 +1,5 @@
 phpstan:
-	vendor/bin/phpstan analyse src --level=9
+	vendor/bin/phpstan analyse src bin --level=9
 
 cs-fix:
 

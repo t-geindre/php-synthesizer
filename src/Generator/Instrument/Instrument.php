@@ -5,16 +5,14 @@ use Synthesizer\Generator\Effect\Effect;
 use Synthesizer\Generator\Generator;
 use Synthesizer\Generator\Instrument\Utils\Envelope;
 use Synthesizer\Generator\Instrument\Utils\NotesFrequencies;
-use Synthesizer\Generator\Oscillator\Sinusoidal;
 use Synthesizer\Time\Clock;
 
 abstract class Instrument
 {
-    /** @var array<Sinusoidal>  */
+    /** @var Generator[] */
     private array $keys;
-    /** @var array<Envelope> */
+    /** @var Envelope[] */
     private array $keysDown = [];
-    /** @var array<string, array> */
     protected Clock $clock;
     /** @var array<Envelope> */
     protected array $keysReleased = [];
@@ -87,7 +85,8 @@ abstract class Instrument
         }
     }
 
-    private function initializeKeys() {
+    private function initializeKeys() : void
+    {
         foreach (NotesFrequencies::FREQUENCIES as $key => $frequency) {
             $this->keys[$key] = $this->initializeKey($frequency);
         }

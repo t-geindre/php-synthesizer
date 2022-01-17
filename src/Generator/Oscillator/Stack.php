@@ -6,7 +6,7 @@ use Synthesizer\Generator\Generator;
 
 class Stack implements Generator
 {
-    /** @var array<Generator> */
+    /** @var Generator[] */
     private array $stack;
     private float $lastValue = 0;
     private int $mode;
@@ -19,7 +19,7 @@ class Stack implements Generator
         $this->mode = $mode;
     }
 
-    public function push(Generator $generator)
+    public function push(Generator $generator) : void
     {
         $this->stack[] = $generator;
     }
