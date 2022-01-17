@@ -29,10 +29,10 @@ $clock = $output->getClock();
 $arranger = new Arranger(0.25 * MAX_AMPLITUDE);
 $arranger->addTracks(require($songFile));
 
-while(!$arranger->isOver()) {
-    try {
+try {
+    while(!$arranger->isOver()) {
         $output->addSample((int) $arranger->getValue());
-    } catch (\InvalidArgumentException $e) {
-        error($e->getMessage());
     }
+} catch (\InvalidArgumentException $e) {
+    error($e->getMessage());
 }
