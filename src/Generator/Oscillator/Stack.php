@@ -9,6 +9,15 @@ class Stack implements Generator
     /** @var array<Generator> */
     private array $stack;
     private float $lastValue = 0;
+    private int $mode;
+
+    const MODE_ADDITIVE = 1;
+    const MODE_SUBTRACTIVE = -1;
+
+    public function __construct(int $mode = self::MODE_ADDITIVE)
+    {
+        $this->mode = $mode;
+    }
 
     public function push(Generator $generator)
     {
@@ -22,10 +31,11 @@ class Stack implements Generator
 
     public function getValue(): float
     {
-        $this->lastValue = array_sum(array_map(
-            fn (Generator $generator) => $generator->getValue(),
-            $this->stack
-        ));
+        $this->lastValue = array_reduce(
+            $this->stack,
+            fn (float $carry, Generator $generator) => $carry + $generator->getValue() * $this->mode,
+            0.0
+        );
 
         return $this->lastValue;
     }
