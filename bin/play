@@ -3,7 +3,7 @@
 require(__DIR__.'/../vendor/autoload.php');
 
 use Synthesizer\Generator\Arranger\Arranger;
-use Synthesizer\Output\Wave;
+use Synthesizer\Output\Wav;
 
 const MAX_AMPLITUDE = 32768;
 
@@ -23,7 +23,7 @@ if (!file_exists($songFile = __DIR__.'/songs/'.strtolower($argv[1]).'.php')) {
     error(sprintf('Unknown song %s', $argv[1]));
 }
 
-$output = new Wave();
+$output = new Wav();
 $clock = $output->getClock();
 
 $arranger = new Arranger(0.25 * MAX_AMPLITUDE);
@@ -36,5 +36,3 @@ while(!$arranger->isOver()) {
         error($e->getMessage());
     }
 }
-
-$output->flush();
