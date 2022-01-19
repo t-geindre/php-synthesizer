@@ -14,7 +14,10 @@ abstract class Instrument implements Generator
     private array $keysDown = [];
     protected Clock $clock;
     /** @var array<Envelope> */
-    protected array $keysReleased = [];
+    private array $keysReleased = [];
+    private bool $isSustainOn = false;
+    /** @var array<Envelope> */
+    private array $sustainedKeys = [];
 
     const VELOCITY_MAX = 127;
 
@@ -27,21 +30,27 @@ abstract class Instrument implements Generator
 
     public function getValue() : float
     {
-        $value = 0;
-
-        foreach ($this->keysDown as $key => $generator) {
-            $value += $generator->getValue();
-
-            if ($generator->isOver()) {
-                unset($this->keysDown[$key]);
+        if (!$this->isSustainOn) {
+            foreach ($this->sustainedKeys as $key => $generator) {
+                $generator->noteOff();
+                $this->keysReleased[] = $generator;
+                unset($this->sustainedKeys[$key]);
             }
         }
 
-        foreach ($this->keysReleased as $key => $generator) {
-            $value += $generator->getValue();
+        $value = 0;
 
-            if ($generator->isOver()) {
-                unset($this->keysReleased[$key]);
+        foreach ([
+            &$this->keysDown,
+            &$this->keysReleased,
+            &$this->sustainedKeys
+        ] as &$generators) {
+            foreach ($generators as $key => $generator) {
+                $value += $generator->getValue();
+
+                if ($generator->isOver()) {
+                    unset($generators[$key]);
+                }
             }
         }
 
@@ -59,8 +68,14 @@ abstract class Instrument implements Generator
             throw new \InvalidArgumentException(sprintf('Unknown note "%s"', $key));
         }
 
+        if (isset($this->sustainedKeys[$key])) {
+            $this->sustainedKeys[$key]->noteOff();
+            $this->keysReleased[] = $this->sustainedKeys[$key];
+            unset($this->sustainedKeys[$key]);
+        }
+
         if (isset($this->keysDown[$key])) {
-            $this->noteOff($key);;
+            $this->noteOff($key);
         }
 
         $this->keysDown[$key] = $this->getEnvelope($this->keys[$key]);
@@ -74,10 +89,27 @@ abstract class Instrument implements Generator
             return;
         }
 
-        $this->keysDown[$key]->noteOff();
-        $this->keysReleased[] = $this->keysDown[$key];
-
+        $generator = $this->keysDown[$key];
         unset($this->keysDown[$key]);
+
+        if ($this->isSustainOn) {
+            $this->sustainedKeys[$key] = $generator;
+
+            return;
+        }
+
+        $this->keysReleased[] = $generator;
+        $generator->noteOff();
+    }
+
+    public function sustainOn(): void
+    {
+        $this->isSustainOn = true;
+    }
+
+    public function sustainOff(): void
+    {
+        $this->isSustainOn = false;
     }
 
     public function noteOffAll() : void

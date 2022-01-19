@@ -25,15 +25,20 @@ while(true) {
     $messages = $device->pullMessages();
     foreach ($messages as $message) {
         if ($message->getNote() === 'sustain') {
-            // todo Implement sustain
+            if ($message->isOn()) {
+                $instrument->sustainOn();
+            } else {
+                $instrument->sustainOff();
+            }
             continue;
         }
         if ($message->getNote() === SWITCH_KEY) {
             if ($message->isOn()) {
+                $instrument->sustainOff();
                 $instrument->noteOffAll();
                 $instrumentIndex = ++$instrumentIndex > count($instruments) - 1 ? 0 : $instrumentIndex;
                 $instrument = $instruments[$instrumentIndex];
-                $instrument->noteOff(DEMO_KEY);
+                $instrument->noteOn(DEMO_KEY);
             } else {
                 $instrument->noteOff(DEMO_KEY);
             }
