@@ -11,8 +11,8 @@ class Bell extends Instrument
 {
     protected function initializeKey(float $frequency): Generator
     {
-        $ref = new Oscillator($frequency * 2, 1, $this->clock, Oscillator::SHAPE_SINUSOIDAL);
-        $ref->setLfo(new Oscillator(5, 0.4, $this->clock, Oscillator::SHAPE_SINUSOIDAL));
+        $ref = new Oscillator($frequency * 2, 0.7, $this->clock, Oscillator::SHAPE_SINUSOIDAL);
+        $ref->setLfo(new Oscillator(5, 0.3, $this->clock, Oscillator::SHAPE_SINUSOIDAL));
 
         $stack = new Stack();
         $stack->push($ref);
