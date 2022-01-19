@@ -6,7 +6,7 @@ use Synthesizer\Generator\Generator;
 
 class Arranger implements Generator
 {
-    /** @var array<Track> */
+    /** @var Track[] */
     private array $tracks = [];
     private float $amplitude;
 
@@ -20,6 +20,7 @@ class Arranger implements Generator
         $this->tracks[] = $track;
     }
 
+    /** @param Track[] $tracks */
     public function addTracks(array $tracks) : void
     {
         foreach ($tracks as $track) {

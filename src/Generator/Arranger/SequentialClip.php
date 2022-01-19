@@ -2,17 +2,10 @@
 
 namespace Synthesizer\Generator\Arranger;
 
-use Synthesizer\Time\Clock;
-
 class SequentialClip extends Clip
 {
-    private Clock $clock;
-
-    // note, at, duration
-    private array $partition = [];
-
     /**
-     * @param array<array<string, int>> $partition Array of notes : [note, duration (ms)]
+     * @param array<array<mixed>> $partition Array of notes : [note, duration (ms)]
      *
      * This Clip can only handle one note at a time
      * When a note ends (duration is over), the next note is played.

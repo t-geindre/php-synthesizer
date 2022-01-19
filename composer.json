@@ -14,5 +14,9 @@
     ],
     "require-dev": {
         "phpstan/phpstan": "^1.4"
+    },
+    "minimum-stability" : "dev",
+    "require": {
+        "bviguier/php-rtmidi": "dev-main"
     }
 }

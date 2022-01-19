@@ -2,17 +2,13 @@
 
 namespace Synthesizer\Generator\Arranger;
 
-use Synthesizer\Time\Clock;
-
 class Clip
 {
-    private Clock $clock;
-
-    // note, at, duration
+    /** @var array<array<mixed>> */
     private array $partition = [];
 
     /**
-     * @param array<array<string, int, int>> $partition Array of notes : [note, at (ms), duration (ms)]
+     * @param array<array<mixed>> $partition Array of notes : [note, at (ms), duration (ms)]
      */
     public function __construct(array $partition)
     {
@@ -26,6 +22,9 @@ class Clip
         return count($this->partition) == 0;
     }
 
+    /**
+     * @return array<array<mixed>>
+     */
     public function getNotes(float $time) : array
     {
         $notes = [];
@@ -40,7 +39,7 @@ class Clip
         return $notes;
     }
 
-    private function validate()
+    private function validate() : void
     {
         foreach ($this->partition as $key => $line) {
             if (count($line) !== 3) {

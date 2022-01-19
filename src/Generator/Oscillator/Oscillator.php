@@ -36,13 +36,15 @@ class Oscillator implements Generator
 
     public function getValue() : float
     {
-        $this->lastValue = call_user_func([$this, [
+        /** @var callable $valueFunction */
+        $valueFunction = [$this, [
             self::SHAPE_ANALOGIC_SAW => 'getAnalogicSawValue',
             self::SHAPE_DIGITAL_SAW => 'getDigitalSawValue',
             self::SHAPE_NOISE => 'getNoiseValue',
             self::SHAPE_SQUARE => 'getSquareValue',
             self::SHAPE_TRIANGLE => 'getTriangleValue',
-        ][$this->shape] ?? 'getSinusoidalValue']) * $this->getAmplitude();
+        ][$this->shape] ?? 'getSinusoidalValue'];
+        $this->lastValue = call_user_func($valueFunction) * $this->getAmplitude();
 
         return $this->lastValue;
     }
@@ -81,7 +83,7 @@ class Oscillator implements Generator
         return mt_rand(0, 1000) / 1000;
     }
 
-    private function getAnalogicSawValue()
+    private function getAnalogicSawValue() : float
     {
         $value = 0;
 

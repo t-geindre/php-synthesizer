@@ -37,7 +37,7 @@ $partition = [
     ['S', 100],
     ['C4', 300],
 ];
-$partitionLength = array_sum(array_column($partition, 1));
+$partitionLength = (int) array_sum(array_column($partition, 1));
 
 $tracks = [];
 

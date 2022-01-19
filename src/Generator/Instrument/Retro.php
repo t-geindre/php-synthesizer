@@ -11,14 +11,14 @@ class Retro extends Instrument
 {
     protected function initializeKey(float $frequency): Generator
     {
-        $ref = new Oscillator($frequency, 0.8, $this->clock, Oscillator::SHAPE_TRIANGLE);
+        $ref = new Oscillator($frequency, 0.4, $this->clock, Oscillator::SHAPE_TRIANGLE);
         $ref->setLfo(new Oscillator(5, 0.4, $this->clock, Oscillator::SHAPE_SINUSOIDAL));
 
         $stack = new Stack();
         $stack->push($ref);
-        $stack->push(new Oscillator($frequency * 2 , 0.5, $this->clock, Oscillator::SHAPE_TRIANGLE));
-        $stack->push(new Oscillator($frequency * 4 , 0.5, $this->clock, Oscillator::SHAPE_TRIANGLE));
-        $stack->push(new Oscillator($frequency * 6 , 0.5, $this->clock, Oscillator::SHAPE_TRIANGLE));
+        $stack->push(new Oscillator($frequency * 2 , 0.25, $this->clock, Oscillator::SHAPE_TRIANGLE));
+        $stack->push(new Oscillator($frequency * 4 , 0.25, $this->clock, Oscillator::SHAPE_TRIANGLE));
+        $stack->push(new Oscillator($frequency * 6 , 0.25, $this->clock, Oscillator::SHAPE_TRIANGLE));
 
         return $stack;
     }

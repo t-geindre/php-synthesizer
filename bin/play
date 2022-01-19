@@ -4,8 +4,10 @@ require(__DIR__.'/../vendor/autoload.php');
 
 use Synthesizer\Generator\Arranger\Arranger;
 use Synthesizer\Output\Wav;
+use Synthesizer\Time\Clock;
 
 const MAX_AMPLITUDE = 32768;
+const SAMPLE_RATE = 44100;
 
 function error($msg) : void
 {
@@ -23,15 +25,16 @@ if (!file_exists($songFile = __DIR__.'/songs/'.strtolower($argv[1]).'.php')) {
     error(sprintf('Unknown song %s', $argv[1]));
 }
 
-$output = new Wav();
-$clock = $output->getClock();
+$output = new Wav(SAMPLE_RATE);
+$clock = new Clock(1/SAMPLE_RATE);
 
-$arranger = new Arranger(0.25 * MAX_AMPLITUDE);
+$arranger = new Arranger(0.20 * MAX_AMPLITUDE);
 $arranger->addTracks(require($songFile));
 
 try {
     while(!$arranger->isOver()) {
         $output->addSample((int) $arranger->getValue());
+        $clock->tick();
     }
 } catch (\InvalidArgumentException $e) {
     error($e->getMessage());

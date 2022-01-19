@@ -2,29 +2,19 @@
 
 namespace Synthesizer\Output;
 
-use Synthesizer\Time\Clock;
-
 class Wav
 {
     private int $sampleRate;
-    private Clock $clock;
 
     public function __construct(int $sampleRate = 44100)
     {
         $this->sampleRate = $sampleRate;
-        $this->clock = new Clock(1 / $this->sampleRate);
         $this->writeHeaders();
     }
 
-    public function getClock() : Clock
-    {
-        return $this->clock;
-    }
-
-    public function addSample(int $sample)
+    public function addSample(int $sample) : void
     {
         $this->write('v', $sample);
-        $this->clock->tick();
     }
 
     private function writeHeaders() : void
@@ -49,7 +39,10 @@ class Wav
         );
     }
 
-    private function write(string $format, ...$data)
+    /**
+     * @param mixed ...$data
+     */
+    private function write(string $format, ...$data) : void
     {
         echo pack($format, ...$data);
     }

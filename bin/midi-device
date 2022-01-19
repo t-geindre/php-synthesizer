@@ -1,0 +1,51 @@
+#!/usr/bin/env php
+<?php
+require(__DIR__.'/../vendor/autoload.php');
+
+use Synthesizer\Input\Midi\DeviceAutoDiscover;
+use Synthesizer\Output\Wav;
+use Synthesizer\Generator\Instrument\Bell;
+use Synthesizer\Generator\Instrument\Retro;
+use Synthesizer\Time\RealTimeClock;
+
+const MAX_AMPLITUDE = 32768;
+const SWITCH_KEY = 'A0';
+const DEMO_KEY = 'C4';
+const SAMPLE_RATE = '22050';
+const SAMPLE_AHEAD = 100;
+
+$output = new Wav(SAMPLE_RATE);
+$clock = new RealTimeClock(1 / SAMPLE_RATE, SAMPLE_AHEAD);
+
+$device = new DeviceAutoDiscover();
+$instruments = [$instrument = new Retro($clock), new Bell($clock)];
+$instrumentIndex = 0;
+
+while(true) {
+    $messages = $device->pullMessages();
+    foreach ($messages as $message) {
+        if ($message->getNote() === 'sustain') {
+            // todo Implement sustain
+            continue;
+        }
+        if ($message->getNote() === SWITCH_KEY) {
+            if ($message->isOn()) {
+                $instrument->keyUpAll();
+                $instrumentIndex = ++$instrumentIndex > count($instruments) - 1 ? 0 : $instrumentIndex;
+                $instrument = $instruments[$instrumentIndex];
+                $instrument->keyDown(DEMO_KEY);
+            } else {
+                $instrument->keyUp(DEMO_KEY);
+            }
+            continue;
+        }
+        if ($message->isOn()) {
+            $instrument->keyDown($message->getNote());
+        } else {
+            $instrument->keyUp($message->getNote());
+        }
+    }
+
+    $output->addSample($instrument->getValue() * 0.20 * MAX_AMPLITUDE);
+    $clock->tick();
+}
