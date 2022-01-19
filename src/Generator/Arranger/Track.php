@@ -55,17 +55,17 @@ class Track implements Generator
                 /** @var string $note */
                 foreach ($notes as [$note, $duration]) {
                     if (isset($this->playingNotes[$note])) {
-                        $this->instrument->keyUp($note);
+                        $this->instrument->noteOff($note);
                     }
                     $this->playingNotes[$note] = $time + $duration / 1000;
-                    $this->instrument->keyDown($note);
+                    $this->instrument->noteOn($note);
                 }
             }
         }
 
         foreach ($this->playingNotes as $note => $endsAt) {
             if ($endsAt < $time) {
-                $this->instrument->keyUp($note);
+                $this->instrument->noteOff($note);
                 unset($this->playingNotes[$note]);
             }
         }

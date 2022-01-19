@@ -30,19 +30,19 @@ while(true) {
         }
         if ($message->getNote() === SWITCH_KEY) {
             if ($message->isOn()) {
-                $instrument->keyUpAll();
+                $instrument->noteOffAll();
                 $instrumentIndex = ++$instrumentIndex > count($instruments) - 1 ? 0 : $instrumentIndex;
                 $instrument = $instruments[$instrumentIndex];
-                $instrument->keyDown(DEMO_KEY);
+                $instrument->noteOff(DEMO_KEY);
             } else {
-                $instrument->keyUp(DEMO_KEY);
+                $instrument->noteOff(DEMO_KEY);
             }
             continue;
         }
         if ($message->isOn()) {
-            $instrument->keyDown($message->getNote());
+            $instrument->noteOn($message->getNote() , $message->getVelocity());
         } else {
-            $instrument->keyUp($message->getNote());
+            $instrument->noteOff($message->getNote());
         }
     }
 

@@ -1,13 +1,12 @@
 <?php
 namespace Synthesizer\Generator\Instrument;
 
-use Synthesizer\Generator\Effect\Effect;
 use Synthesizer\Generator\Generator;
 use Synthesizer\Generator\Instrument\Utils\Envelope;
 use Synthesizer\Generator\Instrument\Utils\NotesFrequencies;
 use Synthesizer\Time\Clock;
 
-abstract class Instrument
+abstract class Instrument implements Generator
 {
     /** @var Generator[] */
     private array $keys;
@@ -16,6 +15,8 @@ abstract class Instrument
     protected Clock $clock;
     /** @var array<Envelope> */
     protected array $keysReleased = [];
+
+    const VELOCITY_MAX = 127;
 
     public function __construct(Clock $clock)
     {
@@ -52,21 +53,22 @@ abstract class Instrument
         return count($this->keysDown) + count($this->keysReleased) == 0;
     }
 
-    public function keyDown(string $key) : void
+    public function noteOn(string $key, int $velocity = self::VELOCITY_MAX) : void
     {
         if (!isset($this->keys[$key])) {
             throw new \InvalidArgumentException(sprintf('Unknown note "%s"', $key));
         }
 
         if (isset($this->keysDown[$key])) {
-            $this->keyUp($key);;
+            $this->noteOff($key);;
         }
 
         $this->keysDown[$key] = $this->getEnvelope($this->keys[$key]);
+        $this->keysDown[$key]->setStartAmplitude($velocity / self::VELOCITY_MAX);
         $this->keysDown[$key]->noteOn();
     }
 
-    public function keyUp(string $key) : void
+    public function noteOff(string $key) : void
     {
         if (!isset($this->keysDown[$key])) {
             return;
@@ -78,10 +80,10 @@ abstract class Instrument
         unset($this->keysDown[$key]);
     }
 
-    public function keyUpAll() : void
+    public function noteOffAll() : void
     {
         foreach ($this->keysDown as $key => $none) {
-            $this->keyUp($key);
+            $this->noteOff($key);
         }
     }
 
