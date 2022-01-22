@@ -3,11 +3,10 @@
 use Synthesizer\Generator\Arranger\Clip;
 use Synthesizer\Generator\Arranger\SequentialClip;
 use Synthesizer\Generator\Arranger\Track;
-use Synthesizer\Generator\Instrument\Piano;
-use Synthesizer\Generator\Instrument\Retro;
+use Synthesizer\Generator\Instrument\Organ;
 
 /** @var \Synthesizer\Time\Clock $clock*/
-$melodyTrack = new Track(new Retro($clock), $clock, 1);
+$melodyTrack = new Track(new Organ($clock), $clock, 1);
 $melodyTrack->addClip(0, new SequentialClip([
     ['D4', 400],
     ['E4', 400],
@@ -35,7 +34,7 @@ $melodyTrack->addClip(0, new SequentialClip([
     ['D4', 1200],// D1/A1
 ]));
 
-$bassTrack = new Track(new Retro($clock), $clock, 0.5);
+$bassTrack = new Track(new Organ($clock), $clock, 0.5);
 $bassTrack->addClip(800, new Clip([
     ['D2', 0, 1200],
     ['A2', 0, 1200],

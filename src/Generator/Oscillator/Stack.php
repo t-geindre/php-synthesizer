@@ -2,11 +2,9 @@
 
 namespace Synthesizer\Generator\Oscillator;
 
-use Synthesizer\Generator\Generator;
-
-class Stack implements Generator
+class Stack implements Oscillator
 {
-    /** @var Generator[] */
+    /** @var Oscillator[] */
     private array $stack;
     private float $lastValue = 0;
     private int $mode;
@@ -19,9 +17,9 @@ class Stack implements Generator
         $this->mode = $mode;
     }
 
-    public function push(Generator $generator) : void
+    public function push(Oscillator $oscillator) : void
     {
-        $this->stack[] = $generator;
+        $this->stack[] = $oscillator;
     }
 
     public function isOver(): bool
@@ -33,7 +31,7 @@ class Stack implements Generator
     {
         $this->lastValue = array_reduce(
             $this->stack,
-            fn (float $carry, Generator $generator) => $carry + $generator->getValue() * $this->mode,
+            fn (float $carry, Oscillator $oscillator) => $carry + $oscillator->getValue() * $this->mode,
             0.0
         );
 

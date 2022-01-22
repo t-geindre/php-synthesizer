@@ -1,6 +1,6 @@
 <?php
 
-namespace Synthesizer\Generator\Instrument\Utils;
+namespace Synthesizer\Generator\Instrument\Reference;
 
 class NotesFrequencies
 {

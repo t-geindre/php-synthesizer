@@ -5,7 +5,8 @@ require(__DIR__.'/../vendor/autoload.php');
 use Synthesizer\Input\Midi\DeviceAutoDiscover;
 use Synthesizer\Output\Wav;
 use Synthesizer\Generator\Instrument\Bell;
-use Synthesizer\Generator\Instrument\Retro;
+use Synthesizer\Generator\Instrument\Organ;
+use Synthesizer\Generator\Instrument\PolySynth;
 use Synthesizer\Time\RealTimeClock;
 
 const MAX_AMPLITUDE = 32768;
@@ -18,7 +19,7 @@ $output = new Wav(SAMPLE_RATE);
 $clock = new RealTimeClock(1 / SAMPLE_RATE, SAMPLE_AHEAD);
 
 $device = new DeviceAutoDiscover();
-$instruments = [$instrument = new Retro($clock), new Bell($clock)];
+$instruments = [$instrument = new Organ($clock), new Bell($clock), new PolySynth($clock)];
 $instrumentIndex = 0;
 
 while(true) {

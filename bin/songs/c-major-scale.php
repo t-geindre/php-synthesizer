@@ -1,7 +1,7 @@
 <?php
 use Synthesizer\Generator\Arranger\Track;
 use Synthesizer\Generator\Arranger\SequentialClip;
-use Synthesizer\Generator\Instrument\Retro;
+use Synthesizer\Generator\Instrument\Organ;
 use Synthesizer\Generator\Instrument\Bell;
 
 /** @var \Synthesizer\Time\Clock $clock*/
@@ -41,7 +41,7 @@ $partitionLength = (int) array_sum(array_column($partition, 1));
 
 $tracks = [];
 
-$track = new Track(new Retro($clock), $clock);
+$track = new Track(new Organ($clock), $clock);
 $track->addClip(0, new SequentialClip($partition));
 $tracks[] = $track;
 

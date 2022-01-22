@@ -3,32 +3,36 @@
 namespace Synthesizer\Generator\Instrument;
 
 use Synthesizer\Generator\Generator;
-use Synthesizer\Generator\Instrument\Utils\Envelope;
-use Synthesizer\Generator\Oscillator\Oscillator;
+use Synthesizer\Generator\Instrument\Effect\Effect;
+use Synthesizer\Generator\Instrument\Effect\Envelope;
+use Synthesizer\Generator\Oscillator\Base;
+use Synthesizer\Generator\Oscillator\Filter\FirLowPass;
 use Synthesizer\Generator\Oscillator\Stack;
+use Synthesizer\Time\Clock;
 
 class Bell extends Instrument
 {
-    protected function initializeKey(float $frequency): Generator
+    protected function initializeKey(float $frequency, Clock $clock): Generator
     {
-        $ref = new Oscillator($frequency * 2, 0.7, $this->clock, Oscillator::SHAPE_SINUSOIDAL);
-        $ref->setLfo(new Oscillator(5, 0.3, $this->clock, Oscillator::SHAPE_SINUSOIDAL));
-
         $stack = new Stack();
-        $stack->push($ref);
-        $stack->push(new Oscillator($frequency * 4, 0.1, $this->clock, Oscillator::SHAPE_TRIANGLE));
-        $stack->push(new Oscillator($frequency * 8, 0.1, $this->clock, Oscillator::SHAPE_TRIANGLE));
-        $stack->push(new Oscillator($frequency * 16, 0.1, $this->clock, Oscillator::SHAPE_TRIANGLE));
 
-        return $stack;
+        $osc = new Base($frequency, 0.8, 0, $clock, Base::SHAPE_SINUSOIDAL);
+        $osc->setLfo(new Base(5, 0.3, 0, $clock, Base::SHAPE_SINUSOIDAL));
+
+        $stack->push($osc);
+        $stack->push(new Base($frequency * 4, 0.2, 0, $clock, Base::SHAPE_TRIANGLE));
+        $stack->push(new Base($frequency * 8, 0.16, 0, $clock, Base::SHAPE_TRIANGLE));
+        $stack->push(new Base($frequency * 16, 0.16, 0, $clock, Base::SHAPE_TRIANGLE));
+
+        return new FirLowPass($stack, .3);
     }
 
-    protected function getEnvelope(Generator $generator): Envelope
+    protected function buildEffects(Generator $generator, Clock $clock): Effect
     {
-        $env = new Envelope($generator, $this->clock);
+        $env = new Envelope($generator, $clock);
         $env->setAttackTime(.005);
-        $env->setDecayTime(.8);
-        $env->setSustainAmplitude(.1);
+        $env->setDecayTime(2);
+        $env->setSustainAmplitude(0);
         $env->setReleaseTime(.5);
 
         return $env;
