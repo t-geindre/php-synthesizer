@@ -43,6 +43,7 @@ class Track implements Generator
             if ($at / 1000.0 < $time) {
                 $this->playingClipAt = $at;
                 $this->playingClip = $clip;
+                $this->playingClip->reset();
                 unset($this->clips[$at]);
             }
         }

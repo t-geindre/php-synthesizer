@@ -6,20 +6,21 @@ class Clip
 {
     /** @var array<array<mixed>> */
     private array $partition = [];
+    private int $length = 0;
+    private int $index = 0;
+    private int $maxIndex = 0;
 
     /**
      * @param array<array<mixed>> $partition Array of notes : [note, at (ms), duration (ms)]
      */
     public function __construct(array $partition)
     {
-        $this->partition = $partition;
-
-        $this->validate();
+        $this->append($partition);
     }
 
     public function isOver() : bool
     {
-        return count($this->partition) == 0;
+        return $this->index == $this->maxIndex;
     }
 
     /**
@@ -28,20 +29,58 @@ class Clip
     public function getNotes(float $time) : array
     {
         $notes = [];
+        $time *= 1000;
 
-        foreach ($this->partition as $key => [$note, $at, $duration]) {
-            if ($at / 1000 < $time) {
+        for (; $this->index < $this->maxIndex; $this->index++) {
+            [$note, $at, $duration] = $this->partition[$this->index];
+            if ($time >= $at) {
                 $notes[] = [$note, $duration];
-                unset($this->partition[$key]);
+                continue;
             }
+            break;
         }
 
         return $notes;
     }
 
-    private function validate() : void
+    public function getLength(): int
     {
-        foreach ($this->partition as $key => $line) {
+        return $this->length;
+    }
+
+    public function getPartition(): array
+    {
+        return $this->partition;
+    }
+
+    public function reset(): void
+    {
+        $this->index = 0;
+    }
+
+    public function append(array $partition): void
+    {
+        $this->validate($partition);
+
+        if ($this->length > 0) {
+            foreach ($partition as &$note) {
+                $note[1] += $this->length;
+            }
+        }
+
+        $this->partition = array_merge($this->partition, $partition);
+
+        uasort($this->partition, fn(array $a, array $b) => $a[1] <=> $b[1]);
+        $this->partition = array_values($this->partition);
+
+        $this->maxIndex = count($this->partition) - 1;
+
+        $this->computeLength();
+    }
+
+    private function validate(array $partition) : void
+    {
+        foreach ($partition as $key => $line) {
             if (count($line) !== 3) {
                 throw new \InvalidArgumentException(
                     sprintf('Invalid partition, size is "%d" at line "%d", "3" expected', count($line), $key)
@@ -58,6 +97,17 @@ class Clip
                 throw new \InvalidArgumentException(
                     sprintf('Invalid partition, int expected at position 1 or 2, line %d', $key)
                 );
+            }
+        }
+    }
+
+    private function computeLength(): void
+    {
+        $this->length = 0;
+        foreach ($this->partition as $note) {
+            $ends = $note[1] + $note[2];
+            if ($ends > $this->length) {
+                $this->length = $ends;
             }
         }
     }

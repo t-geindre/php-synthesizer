@@ -11,7 +11,7 @@ class SequentialClip extends Clip
      * When a note ends (duration is over), the next note is played.
      * A special note 'S' can be used to introduce a pause before the next note.
      */
-    public function __construct(array $partition)
+    public function append(array $partition): void
     {
         $timedPartition = [];
         $offset = 0;
@@ -24,6 +24,6 @@ class SequentialClip extends Clip
             $offset += $duration;
         }
 
-        parent::__construct($timedPartition);
+        parent::append($timedPartition);
     }
 }
