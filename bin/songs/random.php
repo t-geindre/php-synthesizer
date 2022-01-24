@@ -2,7 +2,7 @@
 
 use Synthesizer\Generator\Arranger\SequentialClip;
 use Synthesizer\Generator\Arranger\Track;
-use Synthesizer\Generator\Instrument\PolySynth;
+use Synthesizer\Generator\Instrument\Kick;
 
 $melodyNotes = ['C3', 'D3', 'E3', 'F3', 'G3', 'A3', 'B3', 'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4'];
 $melodyMaxIndex = count($melodyNotes) - 1;
@@ -29,7 +29,7 @@ for ($i = 0; $i < 100; $i++) {
 }
 
 /** @var \Synthesizer\Time\Clock $clock*/
-$melodyTrack = new Track(new \Synthesizer\Generator\Instrument\PolySynth($clock), $clock, 1);
+$melodyTrack = new Track(new \Synthesizer\Generator\Instrument\Kick($clock), $clock, 1);
 $melodyTrack->addClip(0, new SequentialClip($melodyPartition));
 
 return [$melodyTrack];

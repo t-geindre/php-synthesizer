@@ -6,7 +6,9 @@ use Synthesizer\Input\Midi\DeviceAutoDiscover;
 use Synthesizer\Output\Wav;
 use Synthesizer\Generator\Instrument\Bell;
 use Synthesizer\Generator\Instrument\Organ;
+use Synthesizer\Generator\Instrument\Kick;
 use Synthesizer\Generator\Instrument\PolySynth;
+use Synthesizer\Generator\Instrument\MonoBass;
 use Synthesizer\Time\RealTimeClock;
 
 const MAX_AMPLITUDE = 32768;
@@ -19,7 +21,13 @@ $output = new Wav(SAMPLE_RATE);
 $clock = new RealTimeClock(1 / SAMPLE_RATE, SAMPLE_AHEAD);
 
 $device = new DeviceAutoDiscover();
-$instruments = [$instrument = new Organ($clock), new Bell($clock), new PolySynth($clock)];
+$instruments = [
+    $instrument = new Organ($clock),
+    new Bell($clock),
+    new Kick($clock),
+    new PolySynth($clock),
+    new MonoBass($clock)
+];
 $instrumentIndex = 0;
 
 while(true) {

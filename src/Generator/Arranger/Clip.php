@@ -20,7 +20,7 @@ class Clip
 
     public function isOver() : bool
     {
-        return $this->index == $this->maxIndex;
+        return $this->index >= $this->maxIndex;
     }
 
     /**
@@ -31,15 +31,15 @@ class Clip
         $notes = [];
         $time *= 1000;
 
-        for (; $this->index < $this->maxIndex; $this->index++) {
+        while ($this->index < $this->maxIndex) {
             [$note, $at, $duration] = $this->partition[$this->index];
             if ($time >= $at) {
                 $notes[] = [$note, $duration];
+                $this->index++;
                 continue;
             }
             break;
         }
-
         return $notes;
     }
 
@@ -73,7 +73,7 @@ class Clip
         uasort($this->partition, fn(array $a, array $b) => $a[1] <=> $b[1]);
         $this->partition = array_values($this->partition);
 
-        $this->maxIndex = count($this->partition) - 1;
+        $this->maxIndex = count($this->partition);
 
         $this->computeLength();
     }

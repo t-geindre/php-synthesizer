@@ -14,13 +14,15 @@ class Delay implements Effect
     private int $samplesCount = 0;
     private float $startTime;
     private $noteOn = false;
+    private float $amplitude;
 
-    public function __construct(Generator $generator, Clock $clock, float $delay = .1)
+    public function __construct(Generator $generator, Clock $clock, float $delay = .1, float $amplitude = .1)
     {
         $this->generator = $generator;
         $this->clock = $clock;
         $this->startTime = $clock->getTime() + $delay;
         $this->samples = new \SplQueue();
+        $this->amplitude = $amplitude;
     }
 
     public function isOver(): bool
@@ -30,18 +32,21 @@ class Delay implements Effect
 
     public function getValue(): float
     {
-        if ($this->noteOn || !$this->generator->isOver()) {
-            $this->samples->enqueue($this->generator->getValue());
-            $this->samplesCount++;
-        }
+        $value = $this->generator->getValue();
 
         if ($this->clock->getTime() >= $this->startTime) {
             $this->samplesCount--;
 
-            return $this->samples->dequeue();
+            $value += $this->samples->dequeue() * $this->amplitude;
         }
 
-        return 0;
+        if ($this->noteOn || !$this->generator->isOver()) {
+            $this->samples->enqueue($value);
+            $this->samplesCount++;
+        }
+
+
+        return $value;
     }
 
     public function noteOn(float $velocity): void

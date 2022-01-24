@@ -14,8 +14,7 @@ class Base implements Oscillator
     private ?Base $lfo = null;
     private float $lastValue = 0;
 
-    const SHAPE_ANALOGIC_SAW = 1;
-    const SHAPE_DIGITAL_SAW = 2;
+    const SHAPE_SAWTOOTH = 2;
     const SHAPE_NOISE = 3;
     const SHAPE_SINUSOIDAL = 4;
     const SHAPE_SQUARE = 5;
@@ -40,8 +39,7 @@ class Base implements Oscillator
     {
         /** @var callable $valueFunction */
         $valueFunction = [$this, [
-            self::SHAPE_ANALOGIC_SAW => 'getAnalogicSawValue',
-            self::SHAPE_DIGITAL_SAW => 'getDigitalSawValue',
+            self::SHAPE_SAWTOOTH => 'getDigitalSawValue',
             self::SHAPE_NOISE => 'getNoiseValue',
             self::SHAPE_SQUARE => 'getSquareValue',
             self::SHAPE_TRIANGLE => 'getTriangleValue',
@@ -82,18 +80,7 @@ class Base implements Oscillator
 
     private function getNoiseValue() : float
     {
-        return mt_rand(0, 1000) / 1000;
-    }
-
-    private function getAnalogicSawValue() : float
-    {
-        $value = 0;
-
-        for ($i = 1; $i < 20; $i++) {
-            $value += (sin($i * $this->getCurrentAngle())) / $i;
-        }
-
-        return $value * (2.0 / pi());
+        return mt_rand(-1000, 1000) / 1000;
     }
 
     private function getTriangleValue() : float
@@ -104,8 +91,7 @@ class Base implements Oscillator
     public function isOver(): bool
     {
         switch($this->shape) {
-            case self::SHAPE_ANALOGIC_SAW:
-            case self::SHAPE_DIGITAL_SAW:
+            case self::SHAPE_SAWTOOTH:
             case self::SHAPE_TRIANGLE:
                 return $this->lastValue < 0.001 && $this->lastValue > -0.999;
             default:
