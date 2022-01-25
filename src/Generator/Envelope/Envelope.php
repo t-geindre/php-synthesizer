@@ -1,6 +1,6 @@
 <?php
 
-namespace Synthesizer\Generator\Instrument\Envelope;
+namespace Synthesizer\Generator\Envelope;
 
 use Synthesizer\Generator\Generator;
 use Synthesizer\Time\Clock;

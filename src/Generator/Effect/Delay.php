@@ -1,8 +1,7 @@
 <?php
 
-namespace Synthesizer\Generator\Instrument\Effect;
+namespace Synthesizer\Generator\Effect;
 
-use http\Exception\InvalidArgumentException;
 use Synthesizer\Generator\Generator;
 use Synthesizer\Time\Clock;
 
@@ -18,7 +17,7 @@ class Delay implements Effect
     public function __construct(Generator $generator, Clock $clock, float $delay = .1, float $amplitude = .1)
     {
         if ($delay < 0) {
-            throw new InvalidArgumentException('Delay must be greater than 0');
+            throw new \InvalidArgumentException('Delay must be greater than 0');
         }
 
         $this->generator = $generator;

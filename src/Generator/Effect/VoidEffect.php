@@ -1,6 +1,6 @@
 <?php
 
-namespace Synthesizer\Generator\Instrument\Effect;
+namespace Synthesizer\Generator\Effect;
 
 use Synthesizer\Generator\Generator;
 

@@ -3,9 +3,9 @@
 namespace Synthesizer\Generator\Instrument;
 
 use Synthesizer\Generator\Generator;
-use Synthesizer\Generator\Instrument\Effect\Delay;
-use Synthesizer\Generator\Instrument\Effect\Effect;
-use Synthesizer\Generator\Instrument\Envelope\Envelope;
+use Synthesizer\Generator\Effect\Delay;
+use Synthesizer\Generator\Effect\Effect;
+use Synthesizer\Generator\Envelope\Envelope;
 use Synthesizer\Generator\Oscillator\Base;
 use Synthesizer\Generator\Oscillator\Oscillator;
 use Synthesizer\Generator\Oscillator\Stack;
