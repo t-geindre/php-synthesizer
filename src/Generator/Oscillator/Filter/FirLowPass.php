@@ -4,8 +4,9 @@ namespace Synthesizer\Generator\Oscillator\Filter;
 
 use Synthesizer\Generator\Generator;
 use Synthesizer\Generator\LfoAware;
+use Synthesizer\Generator\Oscillator\Oscillator;
 
-class FirLowPass implements Generator, LfoAware
+class FirLowPass implements Oscillator, LfoAware
 {
     private Generator $generator;
     private float $lastValue = 0;

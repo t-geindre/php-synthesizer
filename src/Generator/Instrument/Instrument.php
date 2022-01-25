@@ -3,31 +3,42 @@ namespace Synthesizer\Generator\Instrument;
 
 use Synthesizer\Generator\Generator;
 use Synthesizer\Generator\Instrument\Effect\Effect;
-use Synthesizer\Generator\Instrument\Effect\Envelope;
 use Synthesizer\Generator\Instrument\Effect\VoidEffect;
+use Synthesizer\Generator\Instrument\Envelope\Envelope;
 use Synthesizer\Generator\Instrument\Reference\NotesFrequencies;
+use Synthesizer\Generator\Oscillator\Oscillator;
+use Synthesizer\Generator\Stack;
 use Synthesizer\Time\Clock;
 
 abstract class Instrument implements Generator
 {
+    private Clock $clock;
+
     /** @var Generator[] */
     private array $keys;
+
     /** @var Envelope[] */
     private array $keysDown = [];
-    private Clock $clock;
-    /** @var array<Envelope> */
-    private array $keysReleased = [];
-    private bool $isSustainOn = false;
-    /** @var array<Envelope> */
+
+    /** @var Envelope[] */
     private array $sustainedKeys = [];
+
+    private Stack $generatorsStack;
+
+    private Effect $generator;
+
+    private bool $isSustainOn = false;
 
     const VELOCITY_MAX = 127;
 
     public function __construct(Clock $clock)
     {
         $this->clock = $clock;
+        $this->generatorsStack = new Stack();
 
         $this->initializeKeys();
+
+        $this->generator = $this->addEffects($this->generatorsStack, $clock);
     }
 
     public function getValue() : float
@@ -35,33 +46,18 @@ abstract class Instrument implements Generator
         if (!$this->isSustainOn) {
             foreach ($this->sustainedKeys as $key => $generator) {
                 $generator->noteOff();
-                $this->keysReleased[] = $generator;
                 unset($this->sustainedKeys[$key]);
             }
         }
 
-        $value = 0;
+        $this->generatorsStack->clearOver();
 
-        foreach ([
-            &$this->keysDown,
-            &$this->keysReleased,
-            &$this->sustainedKeys
-        ] as &$generators) {
-            foreach ($generators as $key => $generator) {
-                $value += $generator->getValue();
-
-                if ($generator->isOver()) {
-                    unset($generators[$key]);
-                }
-            }
-        }
-
-        return $value;
+        return $this->generator->getValue();
     }
 
     public function isOver() : bool
     {
-        return count($this->keysDown) + count($this->keysReleased) == 0;
+        return $this->generatorsStack->isOver();
     }
 
     public function noteOn(string $key, int $velocity = self::VELOCITY_MAX) : void
@@ -72,7 +68,6 @@ abstract class Instrument implements Generator
 
         if (isset($this->sustainedKeys[$key])) {
             $this->sustainedKeys[$key]->noteOff();
-            $this->keysReleased[] = $this->sustainedKeys[$key];
             unset($this->sustainedKeys[$key]);
         }
 
@@ -80,8 +75,10 @@ abstract class Instrument implements Generator
             $this->noteOff($key);
         }
 
-        $this->keysDown[$key] = $this->buildEffects($this->keys[$key], $this->clock);
-        $this->keysDown[$key]->noteOn($velocity / self::VELOCITY_MAX);
+        $this->keysDown[$key] = $generator = $this->getEnvelope($this->keys[$key], $this->clock);
+        $generator->noteOn($velocity / self::VELOCITY_MAX);
+
+        $this->generatorsStack->push($generator);
     }
 
     public function noteOff(string $key) : void
@@ -99,7 +96,6 @@ abstract class Instrument implements Generator
             return;
         }
 
-        $this->keysReleased[] = $generator;
         $generator->noteOff();
     }
 
@@ -127,10 +123,15 @@ abstract class Instrument implements Generator
         }
     }
 
-    protected function buildEffects(Generator $generator, Clock $clock) : Effect
+    protected function getEnvelope(Generator $generator, Clock $clock) : Envelope
+    {
+        return new Envelope($generator, $clock);
+    }
+
+    protected function addEffects(Generator $generator, Clock $clock): Effect
     {
         return new VoidEffect($generator);
     }
 
-    protected abstract function initializeKey(float $frequency, Clock $clock) : Generator;
+    protected abstract function initializeKey(float $frequency, Clock $clock) : Oscillator;
 }

@@ -13,20 +13,6 @@ class VoidEffect implements Effect
         $this->generator = $generator;
     }
 
-    public function noteOn(float $velocity): void
-    {
-        if ($this->generator instanceof Effect) {
-            $this->generator->noteOn($velocity);
-        }
-    }
-
-    public function noteOff(): void
-    {
-        if ($this->generator instanceof Effect) {
-            $this->generator->noteOff();
-        }
-    }
-
     public function isOver(): bool
     {
         return $this->generator->isOver();

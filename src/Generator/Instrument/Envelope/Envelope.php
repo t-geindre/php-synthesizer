@@ -1,11 +1,11 @@
 <?php
 
-namespace Synthesizer\Generator\Instrument\Effect;
+namespace Synthesizer\Generator\Instrument\Envelope;
 
 use Synthesizer\Generator\Generator;
 use Synthesizer\Time\Clock;
 
-class Envelope implements Effect
+class Envelope implements Generator
 {
     private Generator $generator;
     private Clock $clock;

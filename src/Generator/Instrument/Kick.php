@@ -3,15 +3,15 @@
 namespace Synthesizer\Generator\Instrument;
 
 use Synthesizer\Generator\Generator;
-use Synthesizer\Generator\Instrument\Effect\Effect;
-use Synthesizer\Generator\Instrument\Effect\Envelope;
+use Synthesizer\Generator\Instrument\Envelope\Envelope;
 use Synthesizer\Generator\Oscillator\Base;
+use Synthesizer\Generator\Oscillator\Oscillator;
 use Synthesizer\Generator\Oscillator\Stack;
 use Synthesizer\Time\Clock;
 
 class Kick extends Instrument
 {
-    protected function initializeKey(float $frequency, Clock $clock): Generator
+    protected function initializeKey(float $frequency, Clock $clock): Oscillator
     {
         $stack = new Stack();
         $stack->push(new Base($frequency, 2, 0, $clock, Base::SHAPE_SINUSOIDAL));
@@ -20,14 +20,14 @@ class Kick extends Instrument
         return $stack;
     }
 
-    protected function buildEffects(Generator $generator, Clock $clock): Effect
+    protected function getEnvelope(Generator $generator, Clock $clock): Envelope
     {
-        $eff = new Envelope($generator, $clock);
-        $eff->setAttackTime(.01);
-        $eff->setDecayTime(.05);
-        $eff->setSustainAmplitude(0);
-        $eff->setReleaseTime(.1);
+        $env = new Envelope($generator, $clock);
+        $env->setAttackTime(.01);
+        $env->setDecayTime(.05);
+        $env->setSustainAmplitude(0);
+        $env->setReleaseTime(.1);
 
-        return $eff;
+        return $env;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Synthesizer\Generator\Instrument\Effect;
 
+use http\Exception\InvalidArgumentException;
 use Synthesizer\Generator\Generator;
 use Synthesizer\Time\Clock;
 
@@ -11,13 +12,15 @@ class Delay implements Effect
     private Clock $clock;
     /** @var \SplQueue<float> */
     private \SplQueue $samples;
-    private int $samplesCount = 0;
     private float $startTime;
-    private $noteOn = false;
     private float $amplitude;
 
     public function __construct(Generator $generator, Clock $clock, float $delay = .1, float $amplitude = .1)
     {
+        if ($delay < 0) {
+            throw new InvalidArgumentException('Delay must be greater than 0');
+        }
+
         $this->generator = $generator;
         $this->clock = $clock;
         $this->startTime = $clock->getTime() + $delay;
@@ -27,7 +30,7 @@ class Delay implements Effect
 
     public function isOver(): bool
     {
-        return $this->generator->isOver() && $this->samplesCount === 0;
+        return $this->generator->isOver();
     }
 
     public function getValue(): float
@@ -35,35 +38,11 @@ class Delay implements Effect
         $value = $this->generator->getValue();
 
         if ($this->clock->getTime() >= $this->startTime) {
-            $this->samplesCount--;
-
             $value += $this->samples->dequeue() * $this->amplitude;
         }
 
-        if ($this->noteOn || !$this->generator->isOver()) {
-            $this->samples->enqueue($value);
-            $this->samplesCount++;
-        }
-
+        $this->samples->enqueue($value);
 
         return $value;
-    }
-
-    public function noteOn(float $velocity): void
-    {
-        if ($this->generator instanceof Effect) {
-            $this->generator->noteOn($velocity);
-        }
-
-        $this->noteOn = true;
-    }
-
-    public function noteOff(): void
-    {
-        if ($this->generator instanceof Effect) {
-            $this->generator->noteOff();
-        }
-
-        $this->noteOn = false;
     }
 }

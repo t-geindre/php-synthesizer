@@ -22,13 +22,14 @@ $clock = new RealTimeClock(1 / SAMPLE_RATE, SAMPLE_AHEAD);
 
 $device = new DeviceAutoDiscover();
 $instruments = [
-    $instrument = new Organ($clock),
-    new Bell($clock),
-    new Kick($clock),
-    new PolySynth($clock),
-    new MonoBass($clock)
+    fn() => new Organ($clock),
+    fn() => new Bell($clock),
+    fn() => new Kick($clock),
+    fn() => new PolySynth($clock),
+    fn() => new MonoBass($clock),
 ];
 $instrumentIndex = 0;
+$instrument = $instruments[$instrumentIndex]();
 
 while(true) {
     $messages = $device->pullMessages();
@@ -46,7 +47,7 @@ while(true) {
                 $instrument->sustainOff();
                 $instrument->noteOffAll();
                 $instrumentIndex = ++$instrumentIndex > count($instruments) - 1 ? 0 : $instrumentIndex;
-                $instrument = $instruments[$instrumentIndex];
+                $instrument = $instruments[$instrumentIndex]();
                 $instrument->noteOn(DEMO_KEY);
             } else {
                 $instrument->noteOff(DEMO_KEY);

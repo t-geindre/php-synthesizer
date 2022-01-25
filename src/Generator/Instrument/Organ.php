@@ -3,15 +3,15 @@
 namespace Synthesizer\Generator\Instrument;
 
 use Synthesizer\Generator\Generator;
-use Synthesizer\Generator\Instrument\Effect\Effect;
-use Synthesizer\Generator\Instrument\Effect\Envelope;
+use Synthesizer\Generator\Instrument\Envelope\Envelope;
 use Synthesizer\Generator\Oscillator\Base;
+use Synthesizer\Generator\Oscillator\Oscillator;
 use Synthesizer\Generator\Oscillator\Stack;
 use Synthesizer\Time\Clock;
 
 class Organ extends Instrument
 {
-    protected function initializeKey(float $frequency, Clock $clock): Generator
+    protected function initializeKey(float $frequency, Clock $clock): Oscillator
     {
         $ref = new Base($frequency, 0.8, 0, $clock, Base::SHAPE_TRIANGLE);
         $ref->setLfo(new Base(5, 0.4, 0, $clock, Base::SHAPE_SINUSOIDAL));
@@ -25,7 +25,7 @@ class Organ extends Instrument
         return $stack;
     }
 
-    protected function buildEffects(Generator $generator, Clock $clock): Effect
+    protected function getEnvelope(Generator $generator, Clock $clock): Envelope
     {
         $env = new Envelope($generator, $clock);
         $env->setAttackTime(.05);

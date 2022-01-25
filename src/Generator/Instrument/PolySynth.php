@@ -5,14 +5,15 @@ namespace Synthesizer\Generator\Instrument;
 use Synthesizer\Generator\Generator;
 use Synthesizer\Generator\Instrument\Effect\Delay;
 use Synthesizer\Generator\Instrument\Effect\Effect;
-use Synthesizer\Generator\Instrument\Effect\Envelope;
+use Synthesizer\Generator\Instrument\Envelope\Envelope;
 use Synthesizer\Generator\Oscillator\Base;
+use Synthesizer\Generator\Oscillator\Oscillator;
 use Synthesizer\Generator\Oscillator\Stack;
 use Synthesizer\Time\Clock;
 
 class PolySynth extends Instrument
 {
-    protected function initializeKey(float $frequency, Clock $clock): Generator
+    protected function initializeKey(float $frequency, Clock $clock): Oscillator
     {
         $stack = new Stack();
 
@@ -23,14 +24,19 @@ class PolySynth extends Instrument
         return $stack;
     }
 
-    protected function buildEffects(Generator $generator, Clock $clock): Effect
+    protected function getEnvelope(Generator $generator, Clock $clock): Envelope
     {
-        $eff = new Envelope($generator, $clock);
-        $eff->setAttackTime(.002);
-        $eff->setDecayTime(2);
-        $eff->setSustainAmplitude(0);
-        $eff->setReleaseTime(.2);
+        $env = new Envelope($generator, $clock);
+        $env->setAttackTime(.002);
+        $env->setDecayTime(2);
+        $env->setSustainAmplitude(0);
+        $env->setReleaseTime(.2);
 
-        return new Delay($eff, $clock, .4, .2);
+        return $env;
+    }
+
+    protected function addEffects(Generator $generator, Clock $clock): Effect
+    {
+        return new Delay($generator, $clock, .3, .3);
     }
 }

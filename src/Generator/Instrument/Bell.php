@@ -3,16 +3,16 @@
 namespace Synthesizer\Generator\Instrument;
 
 use Synthesizer\Generator\Generator;
-use Synthesizer\Generator\Instrument\Effect\Effect;
-use Synthesizer\Generator\Instrument\Effect\Envelope;
+use Synthesizer\Generator\Instrument\Envelope\Envelope;
 use Synthesizer\Generator\Oscillator\Base;
 use Synthesizer\Generator\Oscillator\Filter\FirLowPass;
+use Synthesizer\Generator\Oscillator\Oscillator;
 use Synthesizer\Generator\Oscillator\Stack;
 use Synthesizer\Time\Clock;
 
 class Bell extends Instrument
 {
-    protected function initializeKey(float $frequency, Clock $clock): Generator
+    protected function initializeKey(float $frequency, Clock $clock): Oscillator
     {
         $stack = new Stack();
 
@@ -27,7 +27,7 @@ class Bell extends Instrument
         return new FirLowPass($stack, .3);
     }
 
-    protected function buildEffects(Generator $generator, Clock $clock): Effect
+    protected function getEnvelope(Generator $generator, Clock $clock): Envelope
     {
         $env = new Envelope($generator, $clock);
         $env->setAttackTime(.005);
