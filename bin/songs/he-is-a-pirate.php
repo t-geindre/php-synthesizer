@@ -1,9 +1,8 @@
 <?php
 
-use Synthesizer\Generator\Arranger\Clip;
-use Synthesizer\Generator\Arranger\Track;
-use Synthesizer\Generator\Instrument\Organ;
-use Synthesizer\Generator\Arranger\SequentialClip;
+use Synthesizer\Input\Producer\Clip\Clip;
+use Synthesizer\Input\Producer\Clip\SequentialClip;
+use Synthesizer\Input\Track;
 use Synthesizer\Generator\Instrument\Kick;
 use Synthesizer\Generator\Instrument\PolySynth;
 use Synthesizer\Generator\Instrument\MonoBass;
@@ -77,11 +76,15 @@ $melody = new SequentialClip([
 ]);
 
 $melodyOct = new Clip(array_map(
-    fn (array $note) => [preg_replace_callback(
-        '/([A-Z#]+)([0-9]{1,})/',
-        fn ($parts) => $parts[1].((int)$parts[2] + 1),
-        $note[0]
-    ), $note[1], $note[2]],
+    function (array $line) {
+        /** @var string $note */
+        [$note, $at, $duration] = $line;
+        return [preg_replace_callback(
+            '/([A-Z#]+)([0-9]{1,})/',
+            fn($parts) => $parts[1] . ((int)$parts[2] + 1),
+            $note
+        ), $at, $duration];
+    },
     $melody->getPartition()
 ));
 
@@ -158,14 +161,14 @@ $kicks = new SequentialClip(array_merge(
     array_fill(0, 64, [['C2', 6 * $s]])
 ));
 
-$melodyTrack = new Track(new PolySynth($clock), $clock, .9);
-$melodyTrack->addClip(0, $melody);
-$melodyTrack->addClip($melody->getLength(), $melodyOct);
+$melodyTrack = Track::withBasicHandler(new PolySynth($clock), $clock);
+$melodyTrack->append($melody);
+$melodyTrack->append($melodyOct);
 
-$accTrack = new Track(new MonoBass($clock), $clock, .8);
-$accTrack->addClip(0, $accompaniment);
+$accTrack = Track::withBasicHandler(new MonoBass($clock), $clock, .8);
+$accTrack->append($accompaniment);
 
-$kickTrack = new Track(new Kick($clock), $clock, .8);
-$kickTrack->addClip(0, $kicks);
+$kickTrack = Track::withBasicHandler(new Kick($clock), $clock);
+$kickTrack->append($kicks);
 
 return [$melodyTrack, $kickTrack, $accTrack];

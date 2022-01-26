@@ -1,6 +1,6 @@
 <?php
 
-namespace Synthesizer\Input\Midi;
+namespace Synthesizer\Input\Producer\Midi;
 
 class NotesReference
 {

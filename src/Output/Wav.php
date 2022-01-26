@@ -6,6 +6,8 @@ class Wav
 {
     private int $sampleRate;
 
+    const MAX_AMPLITUDE = 32767;
+
     public function __construct(int $sampleRate = 44100)
     {
         $this->sampleRate = $sampleRate;

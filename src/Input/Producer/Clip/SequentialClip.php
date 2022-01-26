@@ -1,6 +1,6 @@
 <?php
 
-namespace Synthesizer\Generator\Arranger;
+namespace Synthesizer\Input\Producer\Clip;
 
 class SequentialClip extends Clip
 {

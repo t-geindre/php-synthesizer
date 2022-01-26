@@ -30,7 +30,7 @@ class FirLowPass implements Oscillator, LfoAware
         return $this->lastValue = (1 - $cutOff) * $this->lastValue + $cutOff * $this->generator->getValue();
     }
 
-    public function setLfo(?Generator $lfo)
+    public function setLfo(?Generator $lfo): void
     {
         $this->lfo = $lfo;
     }

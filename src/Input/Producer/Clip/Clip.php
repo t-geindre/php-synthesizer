@@ -1,14 +1,19 @@
 <?php
 
-namespace Synthesizer\Generator\Arranger;
+namespace Synthesizer\Input\Producer\Clip;
 
-class Clip
+use Synthesizer\Input\Producer\Producer;
+
+class Clip implements Producer
 {
     /** @var array<array<mixed>> */
     private array $partition = [];
     private int $length = 0;
     private int $index = 0;
     private int $maxIndex = 0;
+    /** @var array<array<mixed>> */
+    private array $playingNotes = [];
+    private int $playingCount = 0;
 
     /**
      * @param array<array<mixed>> $partition Array of notes : [note, at (ms), duration (ms)]
@@ -20,27 +25,43 @@ class Clip
 
     public function isOver() : bool
     {
-        return $this->index >= $this->maxIndex;
+        return $this->index >= $this->maxIndex && $this->playingCount === 0;
     }
 
-    /**
-     * @return array<array<mixed>>
-     */
-    public function getNotes(float $time) : array
+    public function pullMessages(int $time) : array
     {
-        $notes = [];
-        $time *= 1000;
+        $messages = [];
+
+        /**
+         * @var string $note
+         * @var int $ends
+         */
+        foreach ($this->playingNotes as $key => [$note, $ends]) {
+            if ($time >= $ends) {
+                $messages[] = new Message(false, $note);
+                $this->playingCount--;
+                unset($this->playingNotes[$key]);
+            }
+        }
 
         while ($this->index < $this->maxIndex) {
+            /**
+             * @var string $note
+             * @var int $at
+             * @var int $duration
+             */
             [$note, $at, $duration] = $this->partition[$this->index];
             if ($time >= $at) {
-                $notes[] = [$note, $duration];
+                $messages[] = new Message(true, $note);
+                $this->playingNotes[] = [$note, $time + $duration];
+                $this->playingCount++;
                 $this->index++;
                 continue;
             }
             break;
         }
-        return $notes;
+
+        return $messages;
     }
 
     public function getLength(): int
@@ -48,6 +69,9 @@ class Clip
         return $this->length;
     }
 
+    /**
+     * @return array<array<mixed>>
+     */
     public function getPartition(): array
     {
         return $this->partition;
@@ -56,8 +80,12 @@ class Clip
     public function reset(): void
     {
         $this->index = 0;
+        $this->playingNotes = [];
     }
 
+    /**
+     * @param array<array<mixed>> $partition
+     */
     public function append(array $partition): void
     {
         $this->validate($partition);
@@ -78,6 +106,9 @@ class Clip
         $this->computeLength();
     }
 
+    /**
+     * @param array<array<mixed>> $partition
+     */
     private function validate(array $partition) : void
     {
         foreach ($partition as $key => $line) {
@@ -105,6 +136,7 @@ class Clip
     {
         $this->length = 0;
         foreach ($this->partition as $note) {
+            /** @var int $ends */
             $ends = $note[1] + $note[2];
             if ($ends > $this->length) {
                 $this->length = $ends;

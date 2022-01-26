@@ -1,10 +1,11 @@
 <?php
 
-namespace Synthesizer\Input\Midi;
+namespace Synthesizer\Input\Producer\Midi;
 
 use bviguier\RtMidi\Message as InputMessage;
+use Synthesizer\Input\Message as MessageInterface;
 
-class Message
+class Message implements MessageInterface
 {
     const STATUS_BYTE = 0;
     const NOTE_BYTE = 1;
@@ -18,7 +19,7 @@ class Message
 
     private bool $isOn;
     private int $channel;
-    private ?string $note = null;
+    private string $note;
     private int $velocity;
 
     public function __construct(InputMessage $message)
@@ -26,20 +27,23 @@ class Message
         $statusByte = $message->byte(self::STATUS_BYTE);
         $this->channel = ($statusByte & ~self::CHANNEL_MASK) + 1;
 
+        $note = null;
         switch ($statusByte >> 4) {
             case self::TYPE_NOTE:
-                $this->note = NotesReference::NOTES[$message->byte(self::NOTE_BYTE)] ?? null;
+                $note = NotesReference::NOTES[$message->byte(self::NOTE_BYTE)] ?? null;
                 break;
 
             case self::TYPE_SUSTAIN:
-                $this->note = 'sustain';
+                $note = self::ACTION_SUSTAIN;
                 break;
+
         }
 
-        if (null === $this->note) {
+        if (null === $note) {
             throw new \InvalidArgumentException('Unsupported MIDI message');
         }
 
+        $this->note = $note;
         $this->velocity = $message->byte(self::VELOCITY_BYTE);
         $this->isOn = $this->velocity > 0;
 
@@ -55,7 +59,7 @@ class Message
         return $this->channel;
     }
 
-    public function getNote(): ?string
+    public function getNote(): string
     {
         return $this->note;
     }

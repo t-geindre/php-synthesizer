@@ -1,11 +1,12 @@
 <?php
 
-namespace Synthesizer\Input\Midi;
+namespace Synthesizer\Input\Producer\Midi;
 
 use bviguier\RtMidi\Input;
 use bviguier\RtMidi\MidiBrowser;
+use Synthesizer\Input\Producer\Producer;
 
-class Device
+class Device implements Producer
 {
     private Input $input;
     /** @var \bviguier\RtMidi\Message[]  */
@@ -20,10 +21,7 @@ class Device
         $this->queuedMessages = $queuedMessages;
     }
 
-    /**
-     * @return Message[]
-     */
-    public function pullMessages() : array
+    public function pullMessages(int $time) : array
     {
         $messages = [];
 
@@ -40,5 +38,19 @@ class Device
         }
 
         return $messages;
+    }
+
+    public function getLength(): int
+    {
+        return Producer::INFINITE_LENGTH;
+    }
+
+    public function isOver(): bool
+    {
+        return false;
+    }
+
+    public function reset(): void
+    {
     }
 }

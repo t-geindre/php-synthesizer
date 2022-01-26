@@ -1,7 +1,7 @@
 <?php
-use Synthesizer\Generator\Arranger\Track;
-use Synthesizer\Generator\Arranger\Clip;
-use Synthesizer\Generator\Arranger\SequentialClip;
+use Synthesizer\Input\Track;
+use Synthesizer\Input\Producer\Clip\Clip;
+use Synthesizer\Input\Producer\Clip\SequentialClip;
 use Synthesizer\Generator\Instrument\Bell;
 use Synthesizer\Generator\Instrument\Organ;
 
@@ -9,8 +9,8 @@ use Synthesizer\Generator\Instrument\Organ;
 
 $speed = 13;
 
-$melodyTrack = new Track(new Bell($clock), $clock);
-$melodyTrack->addClip(0, new SequentialClip([
+$melodyTrack = Track::withBasicHandler(new Bell($clock), $clock, .8);
+$melodyTrack->append(new SequentialClip([
     [['E5', 40 * $speed]],
     [['B4', 20 * $speed]],
     [['C5', 20 * $speed]],
@@ -32,8 +32,8 @@ $melodyTrack->addClip(0, new SequentialClip([
     [['A4', 60 * $speed]],
 ]));
 
-$bassTrack = new Track(new Organ($clock), $clock, 0.5);
-$bassTrack->addClip(0, new Clip([
+$bassTrack = Track::withBasicHandler(new Organ($clock), $clock, 0.5);
+$bassTrack->append(new Clip([
     ['B2', 0 * $speed, 40 * $speed],
     ['G#2', 0 * $speed, 40 * $speed],
     ['E2', 40 * $speed, 40 * $speed],

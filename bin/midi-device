@@ -2,14 +2,11 @@
 <?php
 require(__DIR__.'/../vendor/autoload.php');
 
-use Synthesizer\Input\Midi\DeviceAutoDiscover;
+use Synthesizer\Input\Producer\Midi\DeviceAutoDiscover;
+use Synthesizer\Input\Track;
 use Synthesizer\Output\Wav;
-use Synthesizer\Generator\Instrument\Bell;
-use Synthesizer\Generator\Instrument\Organ;
-use Synthesizer\Generator\Instrument\Kick;
-use Synthesizer\Generator\Instrument\PolySynth;
-use Synthesizer\Generator\Instrument\MonoBass;
 use Synthesizer\Time\RealTimeClock;
+use Synthesizer\Input\Handler\CyclingInstrument;
 
 const MAX_AMPLITUDE = 32768;
 const SWITCH_KEY = 'A0';
@@ -20,47 +17,16 @@ const SAMPLE_AHEAD = 100;
 $output = new Wav(SAMPLE_RATE);
 $clock = new RealTimeClock(1 / SAMPLE_RATE, SAMPLE_AHEAD);
 
-$device = new DeviceAutoDiscover();
-$instruments = [
-    fn() => new Organ($clock),
-    fn() => new Bell($clock),
-    fn() => new Kick($clock),
-    fn() => new PolySynth($clock),
-    fn() => new MonoBass($clock),
-];
-$instrumentIndex = 0;
-$instrument = $instruments[$instrumentIndex]();
+$track = new Track(new CyclingInstrument(SWITCH_KEY, DEMO_KEY, [
+    fn() => new Synthesizer\Generator\Instrument\Bell($clock),
+    fn() => new Synthesizer\Generator\Instrument\Kick($clock),
+    fn() => new Synthesizer\Generator\Instrument\MonoBass($clock),
+    fn() => new Synthesizer\Generator\Instrument\Organ($clock),
+    fn() => new Synthesizer\Generator\Instrument\PolySynth($clock),
+]), $clock);
+$track->append(new DeviceAutoDiscover());
 
-while(true) {
-    $messages = $device->pullMessages();
-    foreach ($messages as $message) {
-        if ($message->getNote() === 'sustain') {
-            if ($message->isOn()) {
-                $instrument->sustainOn();
-            } else {
-                $instrument->sustainOff();
-            }
-            continue;
-        }
-        if ($message->getNote() === SWITCH_KEY) {
-            if ($message->isOn()) {
-                $instrument->sustainOff();
-                $instrument->noteOffAll();
-                $instrumentIndex = ++$instrumentIndex > count($instruments) - 1 ? 0 : $instrumentIndex;
-                $instrument = $instruments[$instrumentIndex]();
-                $instrument->noteOn(DEMO_KEY);
-            } else {
-                $instrument->noteOff(DEMO_KEY);
-            }
-            continue;
-        }
-        if ($message->isOn()) {
-            $instrument->noteOn($message->getNote() , $message->getVelocity());
-        } else {
-            $instrument->noteOff($message->getNote());
-        }
-    }
-
-    $output->addSample($instrument->getValue() * 0.20 * MAX_AMPLITUDE);
+while (!$track->isOver()) {
+    $output->addSample((int) ($track->getValue() * 0.20 * MAX_AMPLITUDE));
     $clock->tick();
 }

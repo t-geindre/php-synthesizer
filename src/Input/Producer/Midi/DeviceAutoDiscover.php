@@ -1,11 +1,12 @@
 <?php
 
-namespace Synthesizer\Input\Midi;
+namespace Synthesizer\Input\Producer\Midi;
 
 use bviguier\RtMidi\Input;
 use bviguier\RtMidi\MidiBrowser;
+use Synthesizer\Input\Producer\Producer;
 
-class DeviceAutoDiscover
+class DeviceAutoDiscover implements Producer
 {
     /** @var array<string, Input> */
     private array $inputs;
@@ -25,10 +26,7 @@ class DeviceAutoDiscover
         }
     }
 
-    /**
-     * @return Message[]
-     */
-    public function pullMessages(): array
+    public function pullMessages(int $time): array
     {
         if (null === $this->device) {
             $this->discoverDevice();
@@ -38,7 +36,7 @@ class DeviceAutoDiscover
             }
         }
 
-        return $this->device->pullMessages();
+        return $this->device->pullMessages($time);
     }
 
     private function discoverDevice(): void
@@ -50,5 +48,20 @@ class DeviceAutoDiscover
                 return;
             }
         }
+    }
+
+    public function getLength(): int
+    {
+        return Producer::INFINITE_LENGTH;
+    }
+
+    public function isOver(): bool
+    {
+        return false;
+    }
+
+    public function reset(): void
+    {
+        $this->device = null;
     }
 }

@@ -2,9 +2,10 @@
 <?php
 require(__DIR__.'/../vendor/autoload.php');
 
-use Synthesizer\Generator\Arranger\Arranger;
 use Synthesizer\Output\Wav;
 use Synthesizer\Time\Clock;
+use Synthesizer\Input\Track;
+use Synthesizer\Generator\Stack;
 
 const MAX_AMPLITUDE = 32768;
 const SAMPLE_RATE = 44100;
@@ -28,12 +29,14 @@ if (!file_exists($songFile = __DIR__.'/songs/'.strtolower($argv[1]).'.php')) {
 $output = new Wav(SAMPLE_RATE);
 $clock = new Clock(1/SAMPLE_RATE);
 
-$arranger = new Arranger(0.20 * MAX_AMPLITUDE);
-$arranger->addTracks(require($songFile));
-
+$arranger = new Stack();
+array_map(
+    fn(Track $track) => $arranger->push($track),
+    require($songFile)
+);
 try {
     while(!$arranger->isOver()) {
-        $output->addSample((int) $arranger->getValue());
+        $output->addSample((int) ($arranger->getValue() * .20 * MAX_AMPLITUDE));
         $clock->tick();
     }
 } catch (\InvalidArgumentException $e) {

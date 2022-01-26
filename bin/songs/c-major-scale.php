@@ -1,6 +1,6 @@
 <?php
-use Synthesizer\Generator\Arranger\Track;
-use Synthesizer\Generator\Arranger\SequentialClip;
+use Synthesizer\Input\Track;
+use Synthesizer\Input\Producer\Clip\SequentialClip;
 use Synthesizer\Generator\Instrument\Organ;
 use Synthesizer\Generator\Instrument\Bell;
 use Synthesizer\Generator\Instrument\Kick;
@@ -11,7 +11,7 @@ use Synthesizer\Generator\Instrument\PolySynth;
 
 $clip = new SequentialClip([
     [['C4', 300]],
-    [['S', 50]],
+    [['S', 100]],
     [['D4', 300]],
     [['S', 100]],
     [['E4', 300]],
@@ -50,8 +50,11 @@ foreach ([
     new MonoBass($clock),
     new PolySynth($clock)
 ] as $index => $instrument) {
-    $track = new Track($instrument, $clock);
-    $track->addClip($clip->getLength() * $index + 100, $clip);
+    $track = Track::withBasicHandler($instrument, $clock);
+    $track->addAt(
+        clone $clip,
+        $clip->getLength() * $index + ($index > 0 ? 100 : 0)
+    );
     $tracks[] = $track;
 }
 
