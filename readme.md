@@ -47,6 +47,7 @@ Available songs are:
  - Tetris - `bin/play tetris` The Tetris theme (short)
  - He is a pirate - `bin/play he-is-a-pirate` A short part from the song from Pirate of the caribbean movie
  - C Majors scale - `bin/play c-major-scale` C Major scale played with built-in instruments
+ - Random - `bin/play random` Just plays random notes, sometimes it produces interesting things
  
 ### MIDI device
 
