@@ -17,7 +17,7 @@ class Bell extends Instrument
         $stack = new Stack();
 
         $osc = new Base($frequency, 0.8, 0, $clock, Base::SHAPE_SINUSOIDAL);
-        $osc->setLfo(new Base(5, 0.3, 0, $clock, Base::SHAPE_SINUSOIDAL));
+//        $osc->setLfo(new Base(5, 0.3, 0, $clock, Base::SHAPE_SINUSOIDAL));
 
         $stack->push($osc);
         $stack->push(new Base($frequency * 4, 0.2, 0, $clock, Base::SHAPE_TRIANGLE));

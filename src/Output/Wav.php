@@ -7,16 +7,23 @@ class Wav
     private int $sampleRate;
 
     const MAX_AMPLITUDE = 32767;
+    private float $volume;
 
-    public function __construct(int $sampleRate = 44100)
+    public function __construct(int $sampleRate = 44100, int $volume = 20)
     {
         $this->sampleRate = $sampleRate;
         $this->writeHeaders();
+        $this->volume = $volume / 100;
     }
 
-    public function addSample(int $sample) : void
+    public function addSample(float $sample) : void
     {
-        $this->write('v', $sample);
+        $this->write('v', (int) ($sample * $this->volume * self::MAX_AMPLITUDE));
+    }
+
+    public function getSampleRate(): int
+    {
+        return $this->sampleRate;
     }
 
     private function writeHeaders() : void

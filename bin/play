@@ -7,9 +7,6 @@ use Synthesizer\Time\Clock;
 use Synthesizer\Input\Track;
 use Synthesizer\Generator\Stack;
 
-const MAX_AMPLITUDE = 32768;
-const SAMPLE_RATE = 44100;
-
 function error($msg) : void
 {
     $stderr = fopen('php://stderr', 'w');
@@ -26,8 +23,8 @@ if (!file_exists($songFile = __DIR__.'/songs/'.strtolower($argv[1]).'.php')) {
     error(sprintf('Unknown song %s', $argv[1]));
 }
 
-$output = new Wav(SAMPLE_RATE);
-$clock = new Clock(1/SAMPLE_RATE);
+$output = new Wav();
+$clock = new Clock(1 / $output->getSampleRate());
 
 $arranger = new Stack();
 array_map(
@@ -36,7 +33,7 @@ array_map(
 );
 try {
     while(!$arranger->isOver()) {
-        $output->addSample((int) ($arranger->getValue() * .20 * MAX_AMPLITUDE));
+        $output->addSample($arranger->getValue());
         $clock->tick();
     }
 } catch (\InvalidArgumentException $e) {
