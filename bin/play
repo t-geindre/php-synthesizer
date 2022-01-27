@@ -2,10 +2,9 @@
 <?php
 require(__DIR__.'/../vendor/autoload.php');
 
-use Synthesizer\Output\Wav;
-use Synthesizer\Time\Clock;
-use Synthesizer\Input\Track;
 use Synthesizer\Generator\Stack;
+use Synthesizer\Input\Track;
+use Synthesizer\Output\Wav;
 
 function error($msg) : void
 {
@@ -24,7 +23,7 @@ if (!file_exists($songFile = __DIR__.'/songs/'.strtolower($argv[1]).'.php')) {
 }
 
 $output = new Wav();
-$clock = new Clock(1 / $output->getSampleRate());
+$clock = $output->getClock();
 
 $arranger = new Stack();
 array_map(
@@ -34,7 +33,6 @@ array_map(
 try {
     while(!$arranger->isOver()) {
         $output->addSample($arranger->getValue());
-        $clock->tick();
     }
 } catch (\InvalidArgumentException $e) {
     error($e->getMessage());

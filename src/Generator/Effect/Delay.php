@@ -3,7 +3,7 @@
 namespace Synthesizer\Generator\Effect;
 
 use Synthesizer\Generator\Generator;
-use Synthesizer\Time\Clock;
+use Synthesizer\Time\Clock\Clock;
 
 class Delay implements Effect
 {

@@ -8,7 +8,7 @@ use Synthesizer\Input\Handler\Basic;
 use Synthesizer\Input\Handler\Handler;
 use Synthesizer\Input\Producer\Producer;
 use Synthesizer\Input\Producer\TimedProducer;
-use Synthesizer\Time\Clock;
+use Synthesizer\Time\Clock\Clock;
 
 class Track implements Generator
 {
@@ -113,7 +113,7 @@ class Track implements Generator
 
     public function getValue(): float
     {
-        $time = (int) ($this->clock->getTime() * 1000);
+        $time = (int) $this->clock->getTime();
 
         if (null !== $this->producer) {
             $this->handler->handleMessages(

@@ -7,7 +7,7 @@ use Synthesizer\Generator\Instrument\Kick;
 use Synthesizer\Generator\Instrument\PolySynth;
 use Synthesizer\Generator\Instrument\MonoBass;
 
-/** @var \Synthesizer\Time\Clock $clock*/
+/** @var \Synthesizer\Time\Clock\Clock $clock */
 $s = 80; // Speed
 $melody = new SequentialClip([
     // P1

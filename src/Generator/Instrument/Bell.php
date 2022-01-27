@@ -2,13 +2,13 @@
 
 namespace Synthesizer\Generator\Instrument;
 
-use Synthesizer\Generator\Generator;
 use Synthesizer\Generator\Envelope\Envelope;
+use Synthesizer\Generator\Generator;
 use Synthesizer\Generator\Oscillator\Base;
 use Synthesizer\Generator\Oscillator\Filter\FirLowPass;
 use Synthesizer\Generator\Oscillator\Oscillator;
 use Synthesizer\Generator\Oscillator\Stack;
-use Synthesizer\Time\Clock;
+use Synthesizer\Time\Clock\Clock;
 
 class Bell extends Instrument
 {
@@ -17,7 +17,6 @@ class Bell extends Instrument
         $stack = new Stack();
 
         $osc = new Base($frequency, 0.8, 0, $clock, Base::SHAPE_SINUSOIDAL);
-//        $osc->setLfo(new Base(5, 0.3, 0, $clock, Base::SHAPE_SINUSOIDAL));
 
         $stack->push($osc);
         $stack->push(new Base($frequency * 4, 0.2, 0, $clock, Base::SHAPE_TRIANGLE));
@@ -30,10 +29,10 @@ class Bell extends Instrument
     protected function getEnvelope(Generator $generator, Clock $clock): Envelope
     {
         $env = new Envelope($generator, $clock);
-        $env->setAttackTime(.005);
-        $env->setDecayTime(2);
+        $env->setAttackTime(5);
+        $env->setDecayTime(2000);
         $env->setSustainAmplitude(0);
-        $env->setReleaseTime(.5);
+        $env->setReleaseTime(500);
 
         return $env;
     }

@@ -5,16 +5,17 @@ require(__DIR__.'/../vendor/autoload.php');
 use Synthesizer\Input\Producer\Midi\DeviceAutoDiscover;
 use Synthesizer\Input\Track;
 use Synthesizer\Output\Wav;
-use Synthesizer\Time\RealTimeClock;
+use Synthesizer\Time\Clock\RealTime;
 use Synthesizer\Input\Handler\CyclingInstrument;
 
 const SWITCH_KEY = 'A0';
 const DEMO_KEY = 'C4';
 const SAMPLE_RATE = '22050';
-const SAMPLE_AHEAD = 100;
 
 $output = new Wav(SAMPLE_RATE);
-$clock = new RealTimeClock(1 / SAMPLE_RATE, SAMPLE_AHEAD);
+$output->setClock(
+    $clock = new RealTime($output->getClock())
+);
 
 $track = new Track(new CyclingInstrument(SWITCH_KEY, DEMO_KEY, [
     fn() => new Synthesizer\Generator\Instrument\Bell($clock),
@@ -27,5 +28,4 @@ $track->append(new DeviceAutoDiscover());
 
 while (!$track->isOver()) {
     $output->addSample($track->getValue());
-    $clock->tick();
 }

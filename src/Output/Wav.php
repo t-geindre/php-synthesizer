@@ -2,23 +2,38 @@
 
 namespace Synthesizer\Output;
 
+use Synthesizer\Time\Clock\Basic;
+use Synthesizer\Time\Clock\Clock;
+
 class Wav
 {
     private int $sampleRate;
-
     const MAX_AMPLITUDE = 32767;
     private float $volume;
+    private Clock $clock;
 
     public function __construct(int $sampleRate = 44100, int $volume = 20)
     {
         $this->sampleRate = $sampleRate;
         $this->writeHeaders();
         $this->volume = $volume / 100;
+        $this->clock = new Basic(1000 / $sampleRate);
+    }
+
+    public function getClock(): Clock
+    {
+        return $this->clock;
+    }
+
+    public function setClock(Clock $clock): void
+    {
+        $this->clock = $clock;
     }
 
     public function addSample(float $sample) : void
     {
         $this->write('v', (int) ($sample * $this->volume * self::MAX_AMPLITUDE));
+        $this->clock->tick();
     }
 
     public function getSampleRate(): int

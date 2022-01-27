@@ -1,14 +1,14 @@
 <?php
 namespace Synthesizer\Generator\Instrument;
 
-use Synthesizer\Generator\Generator;
 use Synthesizer\Generator\Effect\Effect;
 use Synthesizer\Generator\Effect\VoidEffect;
 use Synthesizer\Generator\Envelope\Envelope;
-use Synthesizer\Generator\Reference\NotesFrequencies;
+use Synthesizer\Generator\Generator;
 use Synthesizer\Generator\Oscillator\Oscillator;
+use Synthesizer\Generator\Reference\NotesFrequencies;
 use Synthesizer\Generator\Stack;
-use Synthesizer\Time\Clock;
+use Synthesizer\Time\Clock\Clock;
 
 abstract class Instrument implements Generator
 {

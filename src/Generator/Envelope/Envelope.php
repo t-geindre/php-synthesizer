@@ -3,16 +3,16 @@
 namespace Synthesizer\Generator\Envelope;
 
 use Synthesizer\Generator\Generator;
-use Synthesizer\Time\Clock;
+use Synthesizer\Time\Clock\Clock;
 
 class Envelope implements Generator
 {
     private Generator $generator;
     private Clock $clock;
-    private float $attackTime = 0.150;
-	private float $decayTime = 0.10;
+    private float $attackTime = 150;
+	private float $decayTime = 100;
 	private float $sustainAmplitude = 0.8;
-	private float $releaseTime = 0.02;
+	private float $releaseTime = 20;
 	private float $startAmplitude = 1.0;
 	private float $triggerOffTime = 0.0;
 	private float $triggerOnTime = 0.0;

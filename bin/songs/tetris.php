@@ -5,7 +5,7 @@ use Synthesizer\Input\Producer\Clip\SequentialClip;
 use Synthesizer\Generator\Instrument\Bell;
 use Synthesizer\Generator\Instrument\Organ;
 
-/** @var \Synthesizer\Time\Clock $clock */
+/** @var \Synthesizer\Time\Clock\Clock $clock */
 
 $speed = 13;
 

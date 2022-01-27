@@ -2,7 +2,7 @@
 
 namespace Synthesizer\Generator\Oscillator;
 
-use Synthesizer\Time\Clock;
+use Synthesizer\Time\Clock\Clock;
 
 class Base implements Oscillator
 {
@@ -25,11 +25,11 @@ class Base implements Oscillator
         float $amplitude,
         float $phase,
         Clock $clock,
-        int $shape = self::SHAPE_SINUSOIDAL
+        int   $shape = self::SHAPE_SINUSOIDAL
     ) {
         $this->shape = $shape;
         $this->clock = $clock;
-        $this->frequency = $frequency;
+        $this->frequency = $frequency / 1000;
 
         $this->amplitude = $amplitude;
         $this->phase = $phase;

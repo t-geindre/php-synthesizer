@@ -7,7 +7,7 @@ use Synthesizer\Generator\Instrument\Kick;
 use Synthesizer\Generator\Instrument\MonoBass;
 use Synthesizer\Generator\Instrument\PolySynth;
 
-/** @var \Synthesizer\Time\Clock $clock*/
+/** @var \Synthesizer\Time\Clock\Clock $clock */
 
 $clip = new SequentialClip([
     [['C4', 300]],
