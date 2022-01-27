@@ -26,13 +26,7 @@ class PolySynth extends Instrument
 
     protected function getEnvelope(Generator $generator, Clock $clock): Envelope
     {
-        $env = new Envelope($generator, $clock);
-        $env->setAttackTime(2);
-        $env->setDecayTime(2000);
-        $env->setSustainAmplitude(0);
-        $env->setReleaseTime(200);
-
-        return $env;
+        return Envelope::linear($generator, $clock, 2, 2000, 0, 200);
     }
 
     protected function addEffects(Generator $generator, Clock $clock): Effect

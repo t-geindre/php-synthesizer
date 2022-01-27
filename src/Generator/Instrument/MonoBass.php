@@ -22,12 +22,6 @@ class MonoBass extends Instrument
 
     protected function getEnvelope(Generator $generator, Clock $clock): Envelope
     {
-        $env = new Envelope($generator, $clock);
-        $env->setAttackTime(20);
-        $env->setDecayTime(700);
-        $env->setSustainAmplitude(0);
-        $env->setReleaseTime(100);
-
-        return $env;
+        return Envelope::linear($generator, $clock, 20, 700, 0, 100);
     }
 }

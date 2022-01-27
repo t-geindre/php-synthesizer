@@ -22,12 +22,6 @@ class Kick extends Instrument
 
     protected function getEnvelope(Generator $generator, Clock $clock): Envelope
     {
-        $env = new Envelope($generator, $clock);
-        $env->setAttackTime(10);
-        $env->setDecayTime(50);
-        $env->setSustainAmplitude(0);
-        $env->setReleaseTime(100);
-
-        return $env;
+        return Envelope::linear($generator, $clock, 10, 50, 0, 100);
     }
 }

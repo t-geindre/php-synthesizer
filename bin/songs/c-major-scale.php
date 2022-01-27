@@ -1,11 +1,6 @@
 <?php
 use Synthesizer\Input\Track;
 use Synthesizer\Input\Producer\Clip\SequentialClip;
-use Synthesizer\Generator\Instrument\Organ;
-use Synthesizer\Generator\Instrument\Bell;
-use Synthesizer\Generator\Instrument\Kick;
-use Synthesizer\Generator\Instrument\MonoBass;
-use Synthesizer\Generator\Instrument\PolySynth;
 
 /** @var \Synthesizer\Time\Clock\Clock $clock */
 
@@ -44,11 +39,11 @@ $clip = new SequentialClip([
 $tracks = [];
 
 foreach ([
-    new Organ($clock),
-    new Bell($clock),
-    new Kick($clock),
-    new MonoBass($clock),
-    new PolySynth($clock)
+    new \Synthesizer\Generator\Instrument\Organ($clock),
+    new \Synthesizer\Generator\Instrument\Bell($clock),
+    new \Synthesizer\Generator\Instrument\Kick($clock),
+    new \Synthesizer\Generator\Instrument\MonoBass($clock),
+    new \Synthesizer\Generator\Instrument\PolySynth($clock)
 ] as $index => $instrument) {
     $track = Track::withBasicHandler($instrument, $clock);
     $track->addAt(

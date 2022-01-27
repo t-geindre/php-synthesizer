@@ -28,12 +28,6 @@ class Bell extends Instrument
 
     protected function getEnvelope(Generator $generator, Clock $clock): Envelope
     {
-        $env = new Envelope($generator, $clock);
-        $env->setAttackTime(5);
-        $env->setDecayTime(2000);
-        $env->setSustainAmplitude(0);
-        $env->setReleaseTime(500);
-
-        return $env;
+        return Envelope::linear($generator, $clock, 5, 2000, 0, 500);
     }
 }

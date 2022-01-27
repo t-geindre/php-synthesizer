@@ -31,4 +31,9 @@ class Basic implements Clock
     {
         return $this->time;
     }
+
+    public function getTickDuration(): float
+    {
+        return $this->tickDuration / 1000;
+    }
 }

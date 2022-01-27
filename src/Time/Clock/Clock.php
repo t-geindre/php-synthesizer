@@ -12,4 +12,6 @@ interface Clock
     public function getTime(): float;
 
     public function getMicroSecondsTime(): float;
+
+    public function getTickDuration(): float;
 }

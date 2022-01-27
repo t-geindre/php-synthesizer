@@ -4,8 +4,8 @@ namespace Synthesizer\Generator;
 
 class Stack implements Generator
 {
-    /** @var Generator[] */
-    private $generators = [];
+    /** @var \SplObjectStorage<Generator, null> */
+    private \SplObjectStorage $generators;
 
     private int $mode;
     const MODE_ADDITIVE = 1;
@@ -13,12 +13,13 @@ class Stack implements Generator
 
     public function __construct(int $mode = self::MODE_ADDITIVE)
     {
+        $this->generators = new \SplObjectStorage();
         $this->mode = $mode;
     }
 
     public function push(Generator $generator): void
     {
-        $this->generators[] = $generator;
+        $this->generators->attach($generator);
     }
 
     public function isOver(): bool
@@ -33,19 +34,25 @@ class Stack implements Generator
 
     public function getValue(): float
     {
-        return array_reduce(
-            $this->generators,
-            fn (float $carry, Generator $generator) => $carry + $generator->getValue() * $this->mode,
-            0.0
-        );
+        $value = 0;
+        foreach ($this->generators as $generator) {
+            $value += $generator->getValue() * $this->mode;
+        }
+
+        return $value;
     }
 
     public function clearOver(): void
     {
-        foreach ($this->generators as $id => $generator) {
+        foreach ($this->generators as $generator) {
             if ($generator->isOver()) {
-                unset($this->generators[$id]);
+                $this->generators->detach($generator);
             }
         }
+    }
+
+    public function contains(Generator $generator): bool
+    {
+        return $this->generators->contains($generator);
     }
 }

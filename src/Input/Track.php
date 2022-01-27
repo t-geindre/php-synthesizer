@@ -88,7 +88,7 @@ class Track implements Generator
             return false;
         }
 
-        return $this->index >= $this->maxIndex;
+        return $this->index >= $this->maxIndex && $this->handler->getInstrument()->isOver();
     }
 
     private function updateProducer(int $time): void

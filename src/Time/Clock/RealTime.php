@@ -37,4 +37,9 @@ class RealTime implements Clock
     {
         return $this->clock->getMicroSecondsTime();
     }
+
+    public function getTickDuration(): float
+    {
+        return $this->clock->getTickDuration();
+    }
 }

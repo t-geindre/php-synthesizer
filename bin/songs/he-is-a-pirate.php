@@ -171,4 +171,4 @@ $accTrack->append($accompaniment);
 $kickTrack = Track::withBasicHandler(new Kick($clock), $clock);
 $kickTrack->append($kicks);
 
-return [$melodyTrack, $kickTrack, $accTrack];
+return [$melodyTrack, $accTrack, $kickTrack];

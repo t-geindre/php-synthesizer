@@ -125,7 +125,7 @@ abstract class Instrument implements Generator
 
     protected function getEnvelope(Generator $generator, Clock $clock) : Envelope
     {
-        return new Envelope($generator, $clock);
+        return Envelope::linear($generator, $clock, 100, 100, 1, 100);
     }
 
     protected function addEffects(Generator $generator, Clock $clock): Effect

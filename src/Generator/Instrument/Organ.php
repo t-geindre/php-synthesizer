@@ -27,12 +27,6 @@ class Organ extends Instrument
 
     protected function getEnvelope(Generator $generator, Clock $clock): Envelope
     {
-        $env = new Envelope($generator, $clock);
-        $env->setAttackTime(50);
-        $env->setDecayTime(500);
-        $env->setSustainAmplitude(.6);
-        $env->setReleaseTime(200);
-
-        return $env;
+        return Envelope::linear($generator, $clock, 50, 500, .6, 200);
     }
 }
