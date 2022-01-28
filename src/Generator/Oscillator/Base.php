@@ -2,11 +2,8 @@
 
 namespace Synthesizer\Generator\Oscillator;
 
-use Synthesizer\Time\Clock\Clock;
-
 class Base implements Oscillator
 {
-    private Clock $clock;
     private float $frequency;
     private float $amplitude;
     private float $phase;
@@ -24,18 +21,16 @@ class Base implements Oscillator
         float $frequency,
         float $amplitude,
         float $phase,
-        Clock $clock,
         int   $shape = self::SHAPE_SINUSOIDAL
     ) {
         $this->shape = $shape;
-        $this->clock = $clock;
         $this->frequency = $frequency / 1000;
 
         $this->amplitude = $amplitude;
         $this->phase = $phase;
     }
 
-    public function getValue() : float
+    public function getValue(float $deltaTime) : float
     {
         /** @var callable $valueFunction */
         $valueFunction = [$this, [
@@ -44,59 +39,48 @@ class Base implements Oscillator
             self::SHAPE_SQUARE => 'getSquareValue',
             self::SHAPE_TRIANGLE => 'getTriangleValue',
         ][$this->shape] ?? 'getSinusoidalValue'];
-        $this->lastValue = call_user_func($valueFunction) * $this->getAmplitude();
+        $this->lastValue = call_user_func($valueFunction, $deltaTime) * $this->getAmplitude();
 
         return $this->lastValue;
     }
 
-    private function getCurrentAngle() : float
+    private function getCurrentAngle(float $deltaTime) : float
     {
-        $angle = 2 * pi() * $this->frequency * $this->clock->getTime() + $this->phase;
+        $angle = 2 * pi() * $this->frequency * $deltaTime + $this->phase;
 
         if ($this->lfo !== null) {
-            $angle += $this->lfo->getAmplitude() * $this->lfo->getFrequency() * $this->lfo->getValue();
+            $angle += $this->lfo->getAmplitude() * $this->lfo->getFrequency() * $this->lfo->getValue($deltaTime);
         }
 
         return $angle;
     }
 
-    private function getSinusoidalValue() : float
+    private function getSinusoidalValue(float $deltaTime) : float
     {
-        return sin($this->getCurrentAngle());
+        return sin($this->getCurrentAngle($deltaTime));
     }
 
-    private function getDigitalSawValue() : float
+    private function getDigitalSawValue(float $deltaTime) : float
     {
         return
             (2.0 / pi())
-            * ($this->frequency * pi() * fmod($this->clock->getTime() + $this->phase, 1.0 / $this->frequency)
+            * ($this->frequency * pi() * fmod($deltaTime + $this->phase, 1.0 / $this->frequency)
             - (pi() / 2.0));
     }
 
-    private function getSquareValue() : float
+    private function getSquareValue(float $deltaTime) : float
     {
-        return $this->getSinusoidalValue() > 0 ? 1 : -1;
+        return $this->getSinusoidalValue($deltaTime) > 0 ? 1 : -1;
     }
 
-    private function getNoiseValue() : float
+    private function getNoiseValue(float $deltaTime) : float
     {
         return mt_rand(-1000, 1000) / 1000;
     }
 
-    private function getTriangleValue() : float
+    private function getTriangleValue(float $deltaTime) : float
     {
-        return asin($this->getSinusoidalValue()) * (2/pi());
-    }
-
-    public function isOver(): bool
-    {
-        switch($this->shape) {
-            case self::SHAPE_SAWTOOTH:
-            case self::SHAPE_TRIANGLE:
-                return $this->lastValue < 0.001 && $this->lastValue > -0.999;
-            default:
-                return true;
-        }
+        return asin($this->getSinusoidalValue($deltaTime)) * (2/pi());
     }
 
     public function getFrequency(): float

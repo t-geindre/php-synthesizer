@@ -2,30 +2,28 @@
 
 namespace Synthesizer\Generator\Oscillator;
 
-use Synthesizer\Generator\Stack as GeneratorStack;
-
 class Stack implements Oscillator
 {
-    private GeneratorStack $stack;
-    private float $lastValue = 0;
+    /** @var \SplObjectStorage<Oscillator, null> */
+    private \SplObjectStorage $oscillators;
 
-    public function __construct(int $mode = GeneratorStack::MODE_ADDITIVE)
+    public function __construct()
     {
-        $this->stack = new GeneratorStack($mode);
-    }
+        $this->oscillators = new \SplObjectStorage();
+        }
 
     public function push(Oscillator $oscillator) : void
     {
-        $this->stack->push($oscillator);
+        $this->oscillators->attach($oscillator);
     }
 
-    public function isOver(): bool
+    public function getValue(float $deltaTime): float
     {
-        return $this->lastValue < 0.0001 && $this->lastValue > -0.9999;
-    }
+        $value = 0;
+        foreach ($this->oscillators as $oscillator) {
+            $value += $oscillator->getValue($deltaTime);
+        }
 
-    public function getValue(): float
-    {
-        return $this->lastValue = $this->stack->getValue();
+        return $value;
     }
 }

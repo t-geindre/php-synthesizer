@@ -13,18 +13,18 @@ use Synthesizer\Time\Clock\Clock;
 
 class PolySynth extends Instrument
 {
-    protected function initializeKey(float $frequency, Clock $clock): Oscillator
+    protected function getOscillator(float $frequency): Oscillator
     {
         $stack = new Stack();
 
-        $stack->push(new Base($frequency, 0.3, 0, $clock, Base::SHAPE_SAWTOOTH));
-        $stack->push(new Base($frequency - 3, 0.3, 1, $clock, Base::SHAPE_SAWTOOTH));
-        $stack->push(new Base($frequency + 3, 0.3, 1, $clock, Base::SHAPE_SAWTOOTH));
+        $stack->push(new Base($frequency, 0.3, 0, Base::SHAPE_SAWTOOTH));
+        $stack->push(new Base($frequency - 3, 0.3, 1, Base::SHAPE_SAWTOOTH));
+        $stack->push(new Base($frequency + 3, 0.3, 1, Base::SHAPE_SAWTOOTH));
 
         return $stack;
     }
 
-    protected function getEnvelope(Generator $generator, Clock $clock): Envelope
+    protected function getEnvelope(Oscillator $generator, Clock $clock): Envelope
     {
         return Envelope::linear($generator, $clock, 2, 2000, 0, 200);
     }

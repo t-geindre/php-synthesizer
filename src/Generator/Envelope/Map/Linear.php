@@ -27,7 +27,7 @@ class Linear implements Map
             return $this->to;
         }
 
-        return max(0, $amplitude + ($this->to - $amplitude) / $timeLeft / $this->stepsByMs);
+        return max(0, $amplitude + ($this->to - $amplitude) / ($timeLeft + 1)  / $this->stepsByMs);
     }
 
     public function getDuration(): int

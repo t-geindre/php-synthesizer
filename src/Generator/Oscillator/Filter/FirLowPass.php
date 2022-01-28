@@ -2,35 +2,29 @@
 
 namespace Synthesizer\Generator\Oscillator\Filter;
 
-use Synthesizer\Generator\Generator;
 use Synthesizer\Generator\LfoAware;
 use Synthesizer\Generator\Oscillator\Oscillator;
 
 class FirLowPass implements Oscillator, LfoAware
 {
-    private Generator $generator;
+    private Oscillator $oscillator;
     private float $lastValue = 0;
-    private ?Generator $lfo = null;
+    private ?Oscillator $lfo = null;
     private float $cuteOff;
 
-    public function __construct(Generator $generator, float $cuteOff = .1)
+    public function __construct(Oscillator $generator, float $cuteOff = .1)
     {
-        $this->generator = $generator;
+        $this->oscillator = $generator;
         $this->cuteOff = $cuteOff;
     }
 
-    public function isOver(): bool
+    public function getValue(float $deltaTime): float
     {
-        return $this->generator->isOver();
+        $cutOff = $this->lfo != null ? ($this->lfo->getValue($deltaTime) + 1) / 2 : $this->cuteOff;
+        return $this->lastValue = (1 - $cutOff) * $this->lastValue + $cutOff * $this->oscillator->getValue($deltaTime);
     }
 
-    public function getValue(): float
-    {
-        $cutOff = $this->lfo != null ? ($this->lfo->getValue() + 1) / 2 : $this->cuteOff;
-        return $this->lastValue = (1 - $cutOff) * $this->lastValue + $cutOff * $this->generator->getValue();
-    }
-
-    public function setLfo(?Generator $lfo): void
+    public function setLfo(?Oscillator $lfo): void
     {
         $this->lfo = $lfo;
     }

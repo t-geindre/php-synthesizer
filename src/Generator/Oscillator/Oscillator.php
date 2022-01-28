@@ -2,9 +2,7 @@
 
 namespace Synthesizer\Generator\Oscillator;
 
-use Synthesizer\Generator\Generator;
-
-interface Oscillator extends Generator
+interface Oscillator
 {
-
+    public function getValue(float $deltaTime): float;
 }

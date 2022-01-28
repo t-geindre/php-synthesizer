@@ -14,7 +14,7 @@ abstract class Instrument implements Generator
 {
     private Clock $clock;
 
-    /** @var Generator[] */
+    /** @var Oscillator[] */
     private array $keys;
 
     /** @var Envelope[] */
@@ -119,11 +119,11 @@ abstract class Instrument implements Generator
     private function initializeKeys() : void
     {
         foreach (NotesFrequencies::FREQUENCIES as $key => $frequency) {
-            $this->keys[$key] = $this->initializeKey($frequency, $this->clock);
+            $this->keys[$key] = $this->getOscillator($frequency);
         }
     }
 
-    protected function getEnvelope(Generator $generator, Clock $clock) : Envelope
+    protected function getEnvelope(Oscillator $generator, Clock $clock) : Envelope
     {
         return Envelope::linear($generator, $clock, 100, 100, 1, 100);
     }
@@ -133,5 +133,5 @@ abstract class Instrument implements Generator
         return new VoidEffect($generator);
     }
 
-    protected abstract function initializeKey(float $frequency, Clock $clock) : Oscillator;
+    protected abstract function getOscillator(float $frequency) : Oscillator;
 }

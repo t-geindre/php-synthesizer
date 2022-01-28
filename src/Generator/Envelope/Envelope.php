@@ -5,11 +5,12 @@ namespace Synthesizer\Generator\Envelope;
 use Synthesizer\Generator\Envelope\Map\Linear;
 use Synthesizer\Generator\Envelope\Map\Map;
 use Synthesizer\Generator\Generator;
+use Synthesizer\Generator\Oscillator\Oscillator;
 use Synthesizer\Time\Clock\Clock;
 
 class Envelope implements Generator
 {
-    private Generator $generator;
+    private Oscillator $oscillator;
     private Clock $clock;
 
     private Map $attack;
@@ -31,14 +32,14 @@ class Envelope implements Generator
 	private float $triggerOffTime = 0;
 
     public function __construct(
-        Generator $generator,
+        Oscillator $generator,
         Clock $clock,
         Map $attack,
         Map $decay,
         float $sustain,
         Map $release
     ) {
-        $this->generator = $generator;
+        $this->oscillator = $generator;
         $this->clock = $clock;
         $this->setShape($attack, $decay, $sustain, $release);
     }
@@ -70,7 +71,7 @@ class Envelope implements Generator
 
     public function isOver(): bool
     {
-        return $this->generator->isOver() && $this->phase == self::PHASE_OVER;
+        return $this->phase == self::PHASE_OVER;
     }
 
     public function getValue(): float
@@ -86,9 +87,9 @@ class Envelope implements Generator
                 break;
 
             case self::PHASE_DECAY:
-                $deltaTime -= $this->attack->getDuration();
-                $this->amplitude = $this->decay->getAmplitude($this->amplitude, $deltaTime);
-                if ($deltaTime >= $this->decay->getDuration()){
+                $decayDeltaTime = $deltaTime - $this->attack->getDuration();
+                $this->amplitude = $this->decay->getAmplitude($this->amplitude, $decayDeltaTime);
+                if ($decayDeltaTime >= $this->decay->getDuration()){
                     $this->phase = self::PHASE_DECAY;
                 }
                 break;
@@ -101,19 +102,19 @@ class Envelope implements Generator
                 break;
 
             case self::PHASE_RELEASE:
-                $deltaTime = $this->clock->getTime() -$this->triggerOffTime;
-                $this->amplitude = $this->release->getAmplitude($this->amplitude, $deltaTime);
-                if ($deltaTime >= $this->release->getDuration()){
+                $releaseDeltaTime = $this->clock->getTime() - $this->triggerOffTime;
+                $this->amplitude = $this->release->getAmplitude($this->amplitude, $releaseDeltaTime);
+                if ($releaseDeltaTime >= $this->release->getDuration()){
                     $this->phase = self::PHASE_OVER;
                 }
                 break;
         }
 
-        return $this->generator->getValue() * $this->amplitude * $this->velocity;
+        return $this->oscillator->getValue($deltaTime) * $this->amplitude * $this->velocity;
     }
 
     public static function linear(
-        Generator $generator,
+        Oscillator $generator,
         Clock $clock,
         int $attackDuration,
         int $decayDuration,

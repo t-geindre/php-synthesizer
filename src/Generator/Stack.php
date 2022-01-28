@@ -7,14 +7,9 @@ class Stack implements Generator
     /** @var \SplObjectStorage<Generator, null> */
     private \SplObjectStorage $generators;
 
-    private int $mode;
-    const MODE_ADDITIVE = 1;
-    const MODE_SUBTRACTIVE = -1;
-
-    public function __construct(int $mode = self::MODE_ADDITIVE)
+    public function __construct()
     {
         $this->generators = new \SplObjectStorage();
-        $this->mode = $mode;
     }
 
     public function push(Generator $generator): void
@@ -36,7 +31,7 @@ class Stack implements Generator
     {
         $value = 0;
         foreach ($this->generators as $generator) {
-            $value += $generator->getValue() * $this->mode;
+            $value += $generator->getValue();
         }
 
         return $value;
