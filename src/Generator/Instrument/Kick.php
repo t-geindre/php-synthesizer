@@ -2,9 +2,9 @@
 
 namespace Synthesizer\Generator\Instrument;
 
-use Synthesizer\Generator\Envelope\Envelope;
-use Synthesizer\Generator\Envelope\Shape\Constant;
-use Synthesizer\Generator\Envelope\Shape\Square;
+use Synthesizer\Generator\Envelope;
+use Synthesizer\Shape\Constant;
+use Synthesizer\Shape\Square;
 use Synthesizer\Generator\Oscillator\Base;
 use Synthesizer\Generator\Oscillator\Oscillator;
 use Synthesizer\Generator\Oscillator\Stack;

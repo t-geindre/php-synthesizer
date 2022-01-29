@@ -6,7 +6,7 @@ use Synthesizer\Generator\Instrument\MonoBass;
 use Synthesizer\Input\Producer\Clip\SequentialClip;
 use Synthesizer\Input\Track;
 
-/** @var \Synthesizer\Time\Clock $clock*/
+/** @var \Synthesizer\Time\Clock\Clock $clock*/
 $s = 50; // Speed
 $melody = new SequentialClip($basePart = [
     [['S', 6 * $s]],

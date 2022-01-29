@@ -3,6 +3,7 @@
 namespace Synthesizer\Input\Producer\Clip;
 
 use Synthesizer\Input\Producer\Producer;
+use Synthesizer\Reference\Scaler;
 
 class Clip implements Producer
 {
@@ -104,6 +105,14 @@ class Clip implements Producer
         $this->maxIndex = count($this->partition);
 
         $this->computeLength();
+    }
+
+    public function scale(int $scale): void
+    {
+        /** @var string $note */
+        foreach ($this->partition as [&$note, ]) {
+            $note = Scaler::scaleNote($note, $scale);
+        }
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Synthesizer\Generator\Envelope\Shape;
+namespace Synthesizer\Shape;
 
 class Square implements Shape
 {
@@ -14,7 +14,7 @@ class Square implements Shape
         $this->duration = $duration;
     }
 
-    public function getAmplitude(float $deltaTime): float
+    public function getValue(float $deltaTime): float
     {
         $a =
             ($deltaTime - $this->duration) ** 2 *
@@ -25,14 +25,14 @@ class Square implements Shape
         return $a;
     }
 
-    public function getTargetAmplitude(): float
+    public function getTargetValue(): float
     {
         return $this->to;
     }
 
-    public function setAmplitudeFrom(float $amplitude): void
+    public function setValueFrom(float $value): void
     {
-        $this->from = $amplitude;
+        $this->from = $value;
     }
 
     public function getDuration(): int

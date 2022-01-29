@@ -1,8 +1,8 @@
 <?php
 
-namespace Synthesizer\Generator\Reference;
+namespace Synthesizer\Reference;
 
-class NotesFrequencies
+class Frequencies
 {
     public const FREQUENCIES = [
         'C8' => 4186.01,
@@ -95,3 +95,4 @@ class NotesFrequencies
         'A0' => 27.50,
     ];
 }
+

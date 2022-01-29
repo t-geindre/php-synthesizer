@@ -3,10 +3,10 @@ namespace Synthesizer\Generator\Instrument;
 
 use Synthesizer\Generator\Effect\Effect;
 use Synthesizer\Generator\Effect\VoidEffect;
-use Synthesizer\Generator\Envelope\Envelope;
+use Synthesizer\Generator\Envelope;
 use Synthesizer\Generator\Generator;
 use Synthesizer\Generator\Oscillator\Oscillator;
-use Synthesizer\Generator\Reference\NotesFrequencies;
+use Synthesizer\Reference\Frequencies;
 use Synthesizer\Generator\Stack;
 use Synthesizer\Time\Clock\Clock;
 
@@ -118,7 +118,7 @@ abstract class Instrument implements Generator
 
     private function initializeKeys() : void
     {
-        foreach (NotesFrequencies::FREQUENCIES as $key => $frequency) {
+        foreach (Frequencies::FREQUENCIES as $key => $frequency) {
             $this->keys[$key] = $this->getOscillator($frequency);
         }
     }

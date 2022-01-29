@@ -1,6 +1,6 @@
 <?php
 
-namespace Synthesizer\Generator\Envelope\Shape;
+namespace Synthesizer\Shape;
 
 class Constant implements Shape
 {
@@ -13,17 +13,17 @@ class Constant implements Shape
         $this->duration = $duration;
     }
 
-    public function getAmplitude(float $deltaTime): float
+    public function getValue(float $deltaTime): float
     {
         return $this->const;
     }
 
-    public function getTargetAmplitude(): float
+    public function getTargetValue(): float
     {
         return $this->const;
     }
 
-    public function setAmplitudeFrom(float $amplitude): void
+    public function setValueFrom(float $value): void
     {
     }
 

@@ -4,7 +4,7 @@ namespace Synthesizer\Generator\Instrument;
 
 use Synthesizer\Generator\Effect\Delay;
 use Synthesizer\Generator\Effect\Effect;
-use Synthesizer\Generator\Envelope\Envelope;
+use Synthesizer\Generator\Envelope;
 use Synthesizer\Generator\Generator;
 use Synthesizer\Generator\Oscillator\Base;
 use Synthesizer\Generator\Oscillator\Oscillator;

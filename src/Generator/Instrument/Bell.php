@@ -2,7 +2,7 @@
 
 namespace Synthesizer\Generator\Instrument;
 
-use Synthesizer\Generator\Envelope\Envelope;
+use Synthesizer\Generator\Envelope;
 use Synthesizer\Generator\Oscillator\Base;
 use Synthesizer\Generator\Oscillator\Filter\FirLowPass;
 use Synthesizer\Generator\Oscillator\Oscillator;

@@ -1,12 +1,11 @@
 <?php
 
-namespace Synthesizer\Generator\Envelope;
+namespace Synthesizer\Generator;
 
-use Synthesizer\Generator\Envelope\Shape\Constant;
-use Synthesizer\Generator\Envelope\Shape\Linear;
-use Synthesizer\Generator\Envelope\Shape\Shape;
-use Synthesizer\Generator\Generator;
 use Synthesizer\Generator\Oscillator\Oscillator;
+use Synthesizer\Shape\Constant;
+use Synthesizer\Shape\Linear;
+use Synthesizer\Shape\Shape;
 use Synthesizer\Time\Clock\Clock;
 
 class Envelope implements Generator
@@ -65,7 +64,7 @@ class Envelope implements Generator
     {
         $this->triggerOffTime = $this->clock->getTime();
         $this->phase = self::PHASE_RELEASE;
-        $this->release->setAmplitudeFrom($this->amplitude);
+        $this->release->setValueFrom($this->amplitude);
     }
 
     public function isOver(): bool
@@ -79,29 +78,29 @@ class Envelope implements Generator
 
         switch ($this->phase) {
             case self::PHASE_ATTACK:
-                $this->amplitude = $this->attack->getAmplitude($deltaTime);
+                $this->amplitude = $this->attack->getValue($deltaTime);
                 if ($deltaTime >= $this->attack->getDuration()){
                     $this->phase = self::PHASE_DECAY;
-                    $this->decay->setAmplitudeFrom($this->amplitude);
+                    $this->decay->setValueFrom($this->amplitude);
                 }
                 break;
 
             case self::PHASE_DECAY:
                 $decayDeltaTime = $deltaTime - $this->attack->getDuration();
-                $this->amplitude = $this->decay->getAmplitude($decayDeltaTime);
+                $this->amplitude = $this->decay->getValue($decayDeltaTime);
                 if ($decayDeltaTime >= $this->decay->getDuration()){
                     $this->phase = self::PHASE_SUSTAIN;
-                    $this->sustain->setAmplitudeFrom($this->amplitude);
+                    $this->sustain->setValueFrom($this->amplitude);
                 }
                 break;
 
             case self::PHASE_SUSTAIN:
-                $this->amplitude = $this->sustain->getAmplitude($deltaTime);
+                $this->amplitude = $this->sustain->getValue($deltaTime);
                 break;
 
             case self::PHASE_RELEASE:
                 $releaseDeltaTime = $this->clock->getTime() - $this->triggerOffTime;
-                $this->amplitude = $this->release->getAmplitude($releaseDeltaTime);
+                $this->amplitude = $this->release->getValue($releaseDeltaTime);
                 if ($releaseDeltaTime >= $this->release->getDuration()){
                     $this->phase = self::PHASE_OVER;
                 }
