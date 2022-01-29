@@ -2,8 +2,9 @@
 
 namespace Synthesizer\Generator\Envelope;
 
-use Synthesizer\Generator\Envelope\Map\Linear;
-use Synthesizer\Generator\Envelope\Map\Map;
+use Synthesizer\Generator\Envelope\Shape\Constant;
+use Synthesizer\Generator\Envelope\Shape\Linear;
+use Synthesizer\Generator\Envelope\Shape\Shape;
 use Synthesizer\Generator\Generator;
 use Synthesizer\Generator\Oscillator\Oscillator;
 use Synthesizer\Time\Clock\Clock;
@@ -13,10 +14,10 @@ class Envelope implements Generator
     private Oscillator $oscillator;
     private Clock $clock;
 
-    private Map $attack;
-    private Map $decay;
-    private float $sustain;
-    private Map $release;
+    private Shape $attack;
+    private Shape $decay;
+    private Shape $sustain;
+    private Shape $release;
 
     private int $phase;
     private const PHASE_ATTACK = 1;
@@ -33,22 +34,19 @@ class Envelope implements Generator
 
     public function __construct(
         Oscillator $generator,
-        Clock $clock,
-        Map $attack,
-        Map $decay,
-        float $sustain,
-        Map $release
+        Clock      $clock,
+        Shape      $attack,
+        Shape      $decay,
+        Shape      $sustain,
+        Shape      $release
     ) {
         $this->oscillator = $generator;
         $this->clock = $clock;
         $this->setShape($attack, $decay, $sustain, $release);
     }
 
-    public function setShape(Map $attack, Map $decay, float $sustain, Map $release): void
+    public function setShape(Shape $attack, Shape $decay, Shape $sustain, Shape $release): void
     {
-        $stepsByMs = (int) (1 / $this->clock->getTickDuration());
-        array_map(fn (Map $map) => $map->setStepByMs($stepsByMs), [$attack, $decay, $release]);
-
         $this->attack = $attack;
         $this->decay = $decay;
         $this->sustain = $sustain;
@@ -67,6 +65,7 @@ class Envelope implements Generator
     {
         $this->triggerOffTime = $this->clock->getTime();
         $this->phase = self::PHASE_RELEASE;
+        $this->release->setAmplitudeFrom($this->amplitude);
     }
 
     public function isOver(): bool
@@ -80,30 +79,29 @@ class Envelope implements Generator
 
         switch ($this->phase) {
             case self::PHASE_ATTACK:
-                $this->amplitude = $this->attack->getAmplitude($this->amplitude, $deltaTime);
+                $this->amplitude = $this->attack->getAmplitude($deltaTime);
                 if ($deltaTime >= $this->attack->getDuration()){
                     $this->phase = self::PHASE_DECAY;
+                    $this->decay->setAmplitudeFrom($this->amplitude);
                 }
                 break;
 
             case self::PHASE_DECAY:
                 $decayDeltaTime = $deltaTime - $this->attack->getDuration();
-                $this->amplitude = $this->decay->getAmplitude($this->amplitude, $decayDeltaTime);
+                $this->amplitude = $this->decay->getAmplitude($decayDeltaTime);
                 if ($decayDeltaTime >= $this->decay->getDuration()){
-                    $this->phase = self::PHASE_DECAY;
+                    $this->phase = self::PHASE_SUSTAIN;
+                    $this->sustain->setAmplitudeFrom($this->amplitude);
                 }
                 break;
 
             case self::PHASE_SUSTAIN:
-                $this->amplitude = $this->sustain;
-                if ($this->triggerOffTime > $this->triggerOnTime) {
-                    $this->phase = self::PHASE_RELEASE;
-                }
+                $this->amplitude = $this->sustain->getAmplitude($deltaTime);
                 break;
 
             case self::PHASE_RELEASE:
                 $releaseDeltaTime = $this->clock->getTime() - $this->triggerOffTime;
-                $this->amplitude = $this->release->getAmplitude($this->amplitude, $releaseDeltaTime);
+                $this->amplitude = $this->release->getAmplitude($releaseDeltaTime);
                 if ($releaseDeltaTime >= $this->release->getDuration()){
                     $this->phase = self::PHASE_OVER;
                 }
@@ -126,7 +124,7 @@ class Envelope implements Generator
             $clock,
             new Linear(1, $attackDuration),
             new Linear($sustainAmplitude, $decayDuration),
-            $sustainAmplitude,
+            new Constant($sustainAmplitude),
             new Linear(0, $releaseDuration)
         );
     }

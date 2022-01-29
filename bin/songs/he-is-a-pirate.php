@@ -165,10 +165,10 @@ $melodyTrack = Track::withBasicHandler(new PolySynth($clock), $clock);
 $melodyTrack->append($melody);
 $melodyTrack->append($melodyOct);
 
-$accTrack = Track::withBasicHandler(new MonoBass($clock), $clock, .8);
+$accTrack = Track::withBasicHandler(new MonoBass($clock), $clock, .7);
 $accTrack->append($accompaniment);
 
-$kickTrack = Track::withBasicHandler(new Kick($clock), $clock);
+$kickTrack = Track::withBasicHandler(new Kick($clock), $clock, .6);
 $kickTrack->append($kicks);
 
 return [$melodyTrack, $accTrack, $kickTrack];

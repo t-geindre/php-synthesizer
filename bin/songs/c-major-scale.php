@@ -5,8 +5,8 @@ use Synthesizer\Input\Producer\Clip\SequentialClip;
 /** @var \Synthesizer\Time\Clock\Clock $clock */
 
 $clip = new SequentialClip([
-    [['C4', 300]],
-    [['S', 100]],
+    [['C4', 1000]],
+    [['S', 1000]],
     [['D4', 300]],
     [['S', 100]],
     [['E4', 300]],
