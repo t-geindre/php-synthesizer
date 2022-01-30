@@ -4,7 +4,7 @@ namespace Synthesizer\Generator\Oscillator\Filter;
 
 use Synthesizer\Generator\Oscillator\Oscillator;
 
-class FirLowPass implements Oscillator
+class IifHighPass implements Oscillator
 {
     private Oscillator $oscillator;
     private float $lastValue = 0;
