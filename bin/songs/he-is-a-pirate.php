@@ -35,7 +35,7 @@ $accTrack->append($accompaniment);
 // Kicks track
 /** @var \Synthesizer\Input\Producer\Clip\Clip $kicks */
 $kicks = require (__DIR__.'/clips/he-is-a-pirate/kicks.php');
-$kickTrack = Track::withBasicHandler(new Kick($clock), $clock, .9);
+$kickTrack = Track::withBasicHandler(new Kick($clock), $clock, 1.5);
 $kickTrack->append($kicks);
 
 // Fade out

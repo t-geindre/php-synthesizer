@@ -3,6 +3,7 @@
 use Synthesizer\Automation\Task\FadeOut;
 use Synthesizer\Automation\Task\Variator;
 use Synthesizer\Generator\Instrument\Kick;
+use Synthesizer\Generator\Instrument\MonoBass;
 use Synthesizer\Generator\Instrument\PolySynth;
 use Synthesizer\Input\Track;
 
@@ -28,17 +29,20 @@ $melodyTrack->appendAllAt(
     $melodyTrack->getLength() + ($introEnd = 12) * $speed,
     $melody, $melody, $melodyUp
 );
+$melodyTrack->appendAll($melody, $melody, $melodyUp);
 
 /** @var \Synthesizer\Automation\Automation $automation */
 
-// Intro, tuning synth voices, increase melody track amplitude
-$automation->addTask(new Variator(
-    0, $melody->getLength() * 3, .8, 0,
-    fn(float $v) => $synth->getUnison()->setDetuneStep($v)
-));
+/// FadeIn, smooth song attack
 $automation->addTask(new Variator(
     0, 800, 0, 1,
     fn(float $v) => $melodyTrack->setAmplitude($v)
+));
+
+// Intro, tuning synth voices
+$automation->addTask(new Variator(
+    0, $melody->getLength() * 3, .8, 0,
+    fn(float $v) => $synth->getUnison()->setDetuneStep($v)
 ));
 
 // Intro ends
@@ -47,16 +51,27 @@ $automation->addInline(
     $end,
     function () use ($synth) {
         $synth->getUnison()->setVoices(2);
-        $synth->getUnison()->setDetuneStep(1.2);
+        $synth->getUnison()->setDetuneStep(1);
         $synth->getUnison()->setDephaseStep(1);
     }
 );
+
+// Bass
+$accompaniment = require(__DIR__.'/clips/insomnia/accompaniment.php');
+$bassTrack = Track::withBasicHandler(new MonoBass($clock), $clock);
+$bassTrack->addAt($melody->getLength() * 3 + (2 + $introEnd) * $speed, $accompaniment);
+$bassTrack->appendAll($accompaniment, $accompaniment);
+$bassTrack->appendAll($accompaniment, $accompaniment, $accompaniment);
 
 // Kicks
 $kicks = require(__DIR__.'/clips/insomnia/kicks.php');
 $kicksTrack = Track::withBasicHandler(new Kick($clock), $clock, 2.5);
 $kicksTrack->addAt($melody->getLength() * 3 + (2 + $introEnd) * $speed, $kicks);
 $kicksTrack->appendAll($kicks, $kicks);
+$kicksTrack->appendAll($kicks, $kicks, $kicks);
+
+// Bass
+
 // Fade out
 /** @var \Synthesizer\Output\Output $output */
 $automation->addTask(new Variator(
@@ -64,4 +79,4 @@ $automation->addTask(new Variator(
     fn (float $v) => $output->setVolume((int) $v)
 ));
 
-return [$melodyTrack, $kicksTrack];
+return [$melodyTrack, $kicksTrack, $bassTrack];

@@ -14,7 +14,7 @@ class MonoBass extends Instrument
     {
         $stack = new Stack();
         $stack->push(new Base($frequency, 1, 0, Base::SHAPE_TRIANGLE));
-        $stack->push(new Base($frequency / 2, .4, 1, Base::SHAPE_TRIANGLE));
+        $stack->push(new Base($frequency / 2, .4, 1, Base::SHAPE_SAWTOOTH));
 
         return $stack;
     }
