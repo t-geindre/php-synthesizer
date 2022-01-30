@@ -52,12 +52,11 @@ class Automation
         }
 
         foreach ($this->runningTasks as $key => $task) {
+            $task->apply($time - $task->getStartTime());
             if ($task->getEndTime() <= $time) {
                 $this->runningTasksCount--;
                 unset($this->runningTasks[$key]);
-                continue;
             }
-            $task->apply($time - $task->getStartTime());
         }
     }
 

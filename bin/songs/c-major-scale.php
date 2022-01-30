@@ -5,8 +5,8 @@ use Synthesizer\Input\Producer\Clip\SequentialClip;
 /** @var \Synthesizer\Time\Clock\Clock $clock */
 
 $clip = new SequentialClip([
-    [['C4', 1000]],
-    [['S', 1000]],
+    [['C4', 300]],
+    [['S', 100]],
     [['D4', 300]],
     [['S', 100]],
     [['E4', 300]],
@@ -47,8 +47,8 @@ foreach ([
 ] as $index => $instrument) {
     $track = Track::withBasicHandler($instrument, $clock);
     $track->addAt(
+        $clip->getLength() * $index + ($index > 0 ? 100 : 0),
         clone $clip,
-        $clip->getLength() * $index + ($index > 0 ? 100 : 0)
     );
     $tracks[] = $track;
 }

@@ -13,7 +13,6 @@ class Organ extends Instrument
     protected function getOscillator(float $frequency): Oscillator
     {
         $ref = new Base($frequency, 0.8, 0, Base::SHAPE_TRIANGLE);
-        $ref->setLfo(new Base(5, 0.4, 0, Base::SHAPE_SINUSOIDAL));
 
         $stack = new Stack();
         $stack->push($ref);

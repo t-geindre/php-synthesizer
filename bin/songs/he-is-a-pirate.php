@@ -1,6 +1,7 @@
 <?php
 
 use Synthesizer\Automation\Task\FadeOut;
+use Synthesizer\Automation\Task\Variator;
 use Synthesizer\Generator\Instrument\Kick;
 use Synthesizer\Generator\Instrument\MonoBass;
 use Synthesizer\Generator\Instrument\PolySynth;
@@ -17,9 +18,13 @@ $melody = require(__DIR__.'/clips/he-is-a-pirate/melody.php');
 $melodyOct = clone $melody;
 $melodyOct->scale(12); // Upper octave
 
-$melodyTrack = Track::withBasicHandler(new PolySynth($clock), $clock);
+$melodyTrack = Track::withBasicHandler($synth = new PolySynth($clock), $clock);
 $melodyTrack->append($melody);
 $melodyTrack->append($melodyOct);
+
+$synth->getUnison()->setVoices(2);
+$synth->getUnison()->setDetuneStep(2.5);
+$synth->getUnison()->setDephaseStep(1);
 
 // Accompaniment track
 /** @var \Synthesizer\Input\Producer\Clip\Clip $accompaniment */
@@ -30,16 +35,15 @@ $accTrack->append($accompaniment);
 // Kicks track
 /** @var \Synthesizer\Input\Producer\Clip\Clip $kicks */
 $kicks = require (__DIR__.'/clips/he-is-a-pirate/kicks.php');
-$kickTrack = Track::withBasicHandler(new Kick($clock), $clock, .6);
+$kickTrack = Track::withBasicHandler(new Kick($clock), $clock, .9);
 $kickTrack->append($kicks);
 
 // Fade out
 /** @var \Synthesizer\Automation\Automation $automation */
 /** @var \Synthesizer\Output\Wav $output */
-$automation->addTask(new FadeOut(
-    $melodyTrack->getLength() - 500,
-    $melodyTrack->getLength(),
-    $output
+$automation->addTask(new Variator(
+    $melodyTrack->getLength() - 500, $melodyTrack->getLength(), $output->getVolume(), 0,
+    fn (float $v) => $output->setVolume((int) $v)
 ));
 
 return [$melodyTrack, $accTrack, $kickTrack];

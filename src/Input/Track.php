@@ -41,7 +41,12 @@ class Track implements Generator
         return $this->length;
     }
 
-    public function addAt(Producer $producer, int $at) : void
+    public function setAmplitude(float $amplitude): void
+    {
+        $this->amplitude = $amplitude;
+    }
+
+    public function addAt(int $at, Producer $producer) : void
     {
         $this->producers[] = new TimedProducer($producer, $at);
         $this->validate();
@@ -49,7 +54,26 @@ class Track implements Generator
 
     public function append(Producer $producer): void
     {
-        $this->addAt($producer, $this->length === 0 ? 0 : $this->length + 1);
+        $this->addAt($this->length === 0 ? 0 : $this->length + 1, $producer);
+    }
+
+    public function appendAll(Producer ...$producers): void
+    {
+        foreach ($producers as $producer) {
+            $this->append($producer);
+        }
+    }
+
+    public function appendAllAt(int $at, Producer ...$producers): void
+    {
+        foreach ($producers as $producer) {
+            if (null !== $at) {
+                $this->addAt($at, $producer);
+                $at = null;
+                continue;
+            }
+            $this->append($producer);
+        }
     }
 
     private function validate(): void
@@ -70,7 +94,7 @@ class Track implements Generator
                 continue;
             }
 
-            $this->length += $producer->getLength();
+            $this->length += $producer->getLength() + $producer->getAt() - $this->length;
         }
 
         $this->maxIndex = count($this->producers);

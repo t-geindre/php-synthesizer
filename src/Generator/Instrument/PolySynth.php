@@ -6,6 +6,7 @@ use Synthesizer\Generator\Effect\Delay;
 use Synthesizer\Generator\Effect\Effect;
 use Synthesizer\Generator\Envelope;
 use Synthesizer\Generator\Generator;
+use Synthesizer\Generator\Instrument\PolySynth\Unison;
 use Synthesizer\Generator\Oscillator\Base;
 use Synthesizer\Generator\Oscillator\Oscillator;
 use Synthesizer\Generator\Oscillator\Stack;
@@ -13,13 +14,33 @@ use Synthesizer\Time\Clock\Clock;
 
 class PolySynth extends Instrument
 {
+    private Unison $unison;
+    private Delay $delay;
+
+    public function __construct(Clock $clock)
+    {
+        parent::__construct($clock);
+
+        $this->unison = new Unison();
+    }
+
+    public function getUnison(): Unison
+    {
+        return $this->unison;
+    }
+
+    public function getDelay(): Delay
+    {
+        return $this->delay;
+    }
+
     protected function getOscillator(float $frequency): Oscillator
     {
-        $stack = new Stack();
+        $amplitude = ($voices = $this->unison->getVoices()) === 0 ? 1 : 1 / ($voices + 1);
 
-        $stack->push(new Base($frequency, 0.3, 0, Base::SHAPE_SAWTOOTH));
-        $stack->push(new Base($frequency - 3, 0.3, 1, Base::SHAPE_SAWTOOTH));
-        $stack->push(new Base($frequency + 3, 0.3, 1, Base::SHAPE_SAWTOOTH));
+        $stack = new Stack();
+        $stack->push(new Base($frequency, $amplitude, 0, Base::SHAPE_SAWTOOTH));
+        $this->unison->addOscillators($frequency, $stack);
 
         return $stack;
     }
@@ -31,6 +52,6 @@ class PolySynth extends Instrument
 
     protected function addEffects(Generator $generator, Clock $clock): Effect
     {
-        return new Delay($generator, $clock, 300, .3);
+        return $this->delay = new Delay($generator, $clock, 300, .3);
     }
 }

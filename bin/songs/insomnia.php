@@ -1,89 +1,67 @@
 <?php
 
-use Synthesizer\Generator\Instrument\PolySynth;
+use Synthesizer\Automation\Task\FadeOut;
+use Synthesizer\Automation\Task\Variator;
 use Synthesizer\Generator\Instrument\Kick;
-use Synthesizer\Generator\Instrument\MonoBass;
-use Synthesizer\Input\Producer\Clip\SequentialClip;
+use Synthesizer\Generator\Instrument\PolySynth;
 use Synthesizer\Input\Track;
 
 /** @var \Synthesizer\Time\Clock\Clock $clock*/
-$s = 50; // Speed
-$melody = new SequentialClip($basePart = [
-    [['S', 6 * $s]],
-    [['F#3', 4 * $s], ['B3', 4 * $s], ['E4', 4 * $s],],
-    [['S', 1 * $s]],
-    [['F#3', 4 * $s], ['B3', 4 * $s], ['E4', 4 * $s],],
 
-    [['S', 1 * $s]],
-    [['E4', 2 * $s],],
+// Global song speed, higher value will slow down the song
+$speed = 50;
 
-    [['F#3', 6 * $s], ['B3', 6 * $s], ['D4', 6 * $s],],
-    [['S', 2 * $s]],
-    [['F#3', 4 * $s], ['B3', 4 * $s], ['D4', 4 * $s],],
-    [['S', 1* $s]],
-    [['F#3', 4 * $s], ['B3', 4 * $s], ['D4', 4 * $s],],
+// Melody track
+/** @var \Synthesizer\Input\Producer\Clip\Clip $melody */
+$melody = require(__DIR__.'/clips/insomnia/melody.php');
+/** @var \Synthesizer\Input\Producer\Clip\Clip $melodyUp */
+$melodyUp = require(__DIR__.'/clips/insomnia/melody-up.php');
 
-    [['S', 1* $s]],
-    [['D4', 2 * $s],],
+$synth = new PolySynth($clock);
+$synth->getUnison()->setDephaseStep(0);
+$synth->getUnison()->setVoices(6);
+$synth->getDelay()->setAmplitude(.4);
 
-    [['F#3', 6 * $s], ['B3', 6 * $s], ['C#4', 6 * $s],],
-    [['S', 2 * $s]],
-    [['F#3', 4 * $s], ['B3', 4 * $s], ['C#4', 4 * $s],],
-    [['S', 1 * $s]],
-    [['F#3', 4 * $s], ['B3', 4 * $s], ['C#4', 4 * $s],],
+$melodyTrack = Track::withBasicHandler($synth, $clock);
+$melodyTrack->appendAll($melody, $melody, $melodyUp);
+$melodyTrack->appendAllAt(
+    $melodyTrack->getLength() + ($introEnd = 12) * $speed,
+    $melody, $melody, $melodyUp
+);
 
-    [['S', 1 * $s]],
-    [['C#4', 2 * $s],],
+/** @var \Synthesizer\Automation\Automation $automation */
 
-    [['F#3', 6 * $s], ['B3', 6 * $s], ['D4', 6 * $s],],
-    [['S', 2 * $s]],
-    [['F#3', 4 * $s], ['B3', 4 * $s], ['D4', 4 * $s],],
-    [['S', (int) (1 * $s)]],
-    [['F#3', 4 * $s], ['B3', 4 * $s], ['C#4', 4 * $s],],
-    [['S', (int) (1 * $s)]],
-    [['F#3', 4 * $s], ['B3', 4 * $s], ['D4', 4 * $s],],
-]);
-
-$upPart = $basePart;
-$upPart[6][2][0] = 'F#4';
-$upPart[8][2][0] = 'F#4';
-$upPart[10][2][0] = 'F#4';
-$upPart[12][0][0] = 'F#4';
-
-
-$melody->append($basePart); // 4800
-$melody->append($upPart);
-$melody->append($upPart);
-
-
-$kicks = new SequentialClip(array_merge(
-    array_fill(0, 64, [['G1', 10 * $s]])
+// Intro, tuning synth voices, increase melody track amplitude
+$automation->addTask(new Variator(
+    0, $melody->getLength() * 3, .8, 0,
+    fn(float $v) => $synth->getUnison()->setDetuneStep($v)
+));
+$automation->addTask(new Variator(
+    0, 800, 0, 1,
+    fn(float $v) => $melodyTrack->setAmplitude($v)
 ));
 
+// Intro ends
+$automation->addInline(
+    $end = $melody->getLength() * 3 + $introEnd * $speed,
+    $end,
+    function () use ($synth) {
+        $synth->getUnison()->setVoices(2);
+        $synth->getUnison()->setDetuneStep(1.2);
+        $synth->getUnison()->setDephaseStep(1);
+    }
+);
 
-$acc = new SequentialClip([
-    [['B2', 10 * $s]],
-    [['B2', 10 * $s]],
-    [['B2', 10 * $s]],
-    [['B2', 10 * $s]],
-    [['F#2', 10 * $s]],
-    [['F#2', 10 * $s]],
-    [['G2', 10 * $s]],
-    [['G2', 10 * $s]],
-]);
-
-$melodyTrack = Track::withBasicHandler(new PolySynth($clock), $clock, .5);
-$melodyTrack->append($melody);
-$melodyTrack->append($melody);
-$melodyTrack->append($melody);
-$melodyTrack->append($melody);
-
-$accTrack = Track::withBasicHandler(new MonoBass($clock), $clock);
-//$accTrack->addAT($acc, 2 * $s);
-//$accTrack->append($acc);
-
-$kicksTrack = Track::withBasicHandler(new Kick($clock), $clock, 1);
-$kicksTrack->addAt($kicks, 2 * $s);
-
+// Kicks
+$kicks = require(__DIR__.'/clips/insomnia/kicks.php');
+$kicksTrack = Track::withBasicHandler(new Kick($clock), $clock, 2.5);
+$kicksTrack->addAt($melody->getLength() * 3 + (2 + $introEnd) * $speed, $kicks);
+$kicksTrack->appendAll($kicks, $kicks);
+// Fade out
+/** @var \Synthesizer\Output\Output $output */
+$automation->addTask(new Variator(
+    $melodyTrack->getLength() - 1000, $melodyTrack->getLength(), $output->getVolume(), 0,
+    fn (float $v) => $output->setVolume((int) $v)
+));
 
 return [$melodyTrack, $kicksTrack];

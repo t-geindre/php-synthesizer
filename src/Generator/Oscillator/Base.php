@@ -8,7 +8,7 @@ class Base implements Oscillator
     private float $amplitude;
     private float $phase;
     private int $shape;
-    private ?Base $lfo = null;
+    private ?Oscillator $lfo = null;
     private float $lastValue = 0;
 
     const SHAPE_SAWTOOTH = 2;
@@ -46,11 +46,7 @@ class Base implements Oscillator
 
     private function getCurrentAngle(float $deltaTime) : float
     {
-        $angle = 2 * pi() * $this->frequency * $deltaTime + $this->phase;
-
-        if ($this->lfo !== null) {
-            $angle += $this->lfo->getAmplitude() * $this->lfo->getFrequency() * $this->lfo->getValue($deltaTime);
-        }
+        $angle = 2 * pi() * $this->getLfoAwareFrequency($deltaTime) * $deltaTime + $this->phase;
 
         return $angle;
     }
@@ -64,7 +60,7 @@ class Base implements Oscillator
     {
         return
             (2.0 / pi())
-            * ($this->frequency * pi() * fmod($deltaTime + $this->phase, 1.0 / $this->frequency)
+            * ($this->getLfoAwareFrequency($deltaTime) * pi() * fmod($deltaTime + $this->phase, 1.0 / $this->getLfoAwareFrequency($deltaTime))
             - (pi() / 2.0));
     }
 
@@ -88,12 +84,21 @@ class Base implements Oscillator
         return $this->frequency;
     }
 
+    public function getLfoAwareFrequency(float $deltaTime): float
+    {
+        if(null !== $this->lfo) {
+            return $this->frequency + $this->lfo->getValue($deltaTime);
+        }
+
+        return $this->frequency;
+    }
+
     public function getAmplitude(): float
     {
         return $this->amplitude;
     }
 
-    public function setLfo(?Base $lfo): void
+    public function setLfo(?Oscillator $lfo): void
     {
         $this->lfo = $lfo;
     }

@@ -44,4 +44,9 @@ class Delay implements Effect
 
         return $value;
     }
+
+    public  function setAmplitude(float $amplitude): void
+    {
+        $this->amplitude = $amplitude;
+    }
 }

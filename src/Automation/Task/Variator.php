@@ -2,24 +2,30 @@
 
 namespace Synthesizer\Automation\Task;
 
-use Synthesizer\Output\Output;
 use Synthesizer\Shape\Linear;
 use Synthesizer\Shape\Shape;
 
-class FadeOut implements Task
+class Variator implements Task
 {
     private int $startTime;
     private int $endTime;
-    private Output $output;
     private Shape $shape;
+    /** @var callable */
+    private $callback;
 
-    public function __construct(int $startTime, int $endTime, Output $output, ?Shape $shape = null)
-    {
+    public function __construct(
+        int $startTime,
+        int $endTime,
+        float $from,
+        float $to,
+        callable  $callback,
+        ?Shape $shape = null
+    ) {
         $this->startTime = $startTime;
         $this->endTime = $endTime;
-        $this->output = $output;
-        $this->shape = $shape ?? new Linear(0, $endTime - $startTime);
-        $this->shape->setValueFrom($output->getVolume());
+        $this->shape = $shape ?? new Linear($to, $endTime - $startTime);
+        $this->shape->setValueFrom($from);
+        $this->callback = $callback;
     }
 
     public function getStartTime(): int
@@ -34,6 +40,6 @@ class FadeOut implements Task
 
     public function apply(float $deltaTime): void
     {
-        $this->output->setVolume((int) $this->shape->getValue($deltaTime));
+        call_user_func($this->callback, $this->shape->getValue($deltaTime));
     }
 }

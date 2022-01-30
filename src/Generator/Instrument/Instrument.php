@@ -14,9 +14,6 @@ abstract class Instrument implements Generator
 {
     private Clock $clock;
 
-    /** @var Oscillator[] */
-    private array $keys;
-
     /** @var Envelope[] */
     private array $keysDown = [];
 
@@ -35,8 +32,6 @@ abstract class Instrument implements Generator
     {
         $this->clock = $clock;
         $this->generatorsStack = new Stack();
-
-        $this->initializeKeys();
 
         $this->generator = $this->addEffects($this->generatorsStack, $clock);
     }
@@ -62,7 +57,7 @@ abstract class Instrument implements Generator
 
     public function noteOn(string $key, int $velocity = self::VELOCITY_MAX) : void
     {
-        if (!isset($this->keys[$key])) {
+        if (!isset(Frequencies::FREQUENCIES[$key])) {
             throw new \InvalidArgumentException(sprintf('Unknown note "%s"', $key));
         }
 
@@ -75,10 +70,13 @@ abstract class Instrument implements Generator
             $this->noteOff($key);
         }
 
-        $this->keysDown[$key] = $generator = $this->getEnvelope($this->keys[$key], $this->clock);
+        $generator = $this->getOscillator(Frequencies::FREQUENCIES[$key]);
+        $generator = $this->getEnvelope($generator, $this->clock);
         $generator->noteOn($velocity / self::VELOCITY_MAX);
-
         $this->generatorsStack->push($generator);
+
+        $this->keysDown[$key] = $generator  ;
+
     }
 
     public function noteOff(string $key) : void
@@ -113,13 +111,6 @@ abstract class Instrument implements Generator
     {
         foreach ($this->keysDown as $key => $none) {
             $this->noteOff($key);
-        }
-    }
-
-    private function initializeKeys() : void
-    {
-        foreach (Frequencies::FREQUENCIES as $key => $frequency) {
-            $this->keys[$key] = $this->getOscillator($frequency);
         }
     }
 
