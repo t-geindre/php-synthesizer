@@ -1,15 +1,14 @@
 <?php
-use Synthesizer\Input\Track;
-use Synthesizer\Input\Producer\Clip\Clip;
-use Synthesizer\Input\Producer\Clip\SequentialClip;
+
 use Synthesizer\Generator\Instrument\Bell;
 use Synthesizer\Generator\Instrument\Organ;
-
-/** @var \Synthesizer\Time\Clock\Clock $clock */
+use Synthesizer\Input\Producer\Clip\Clip;
+use Synthesizer\Input\Producer\Clip\SequentialClip;
+use Synthesizer\Input\Track;
 
 $speed = 13;
 
-$melodyTrack = Track::withBasicHandler(new Bell($clock), $clock, .8);
+$melodyTrack = Track::withBasicHandler(new Bell(), .8);
 $melodyTrack->append(new SequentialClip([
     [['E5', 40 * $speed]],
     [['B4', 20 * $speed]],
@@ -32,7 +31,7 @@ $melodyTrack->append(new SequentialClip([
     [['A4', 60 * $speed]],
 ]));
 
-$bassTrack = Track::withBasicHandler(new Organ($clock), $clock, 0.5);
+$bassTrack = Track::withBasicHandler(new Organ(), 0.5);
 $bassTrack->append(new Clip([
     ['B2', 0 * $speed, 40 * $speed],
     ['G#2', 0 * $speed, 40 * $speed],

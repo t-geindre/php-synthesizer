@@ -6,12 +6,10 @@ use Synthesizer\Generator\Oscillator\Oscillator;
 use Synthesizer\Shape\Constant;
 use Synthesizer\Shape\Linear;
 use Synthesizer\Shape\Shape;
-use Synthesizer\Time\Clock\Clock;
 
 class Envelope implements Generator
 {
     private Oscillator $oscillator;
-    private Clock $clock;
 
     private Shape $attack;
     private Shape $decay;
@@ -28,19 +26,12 @@ class Envelope implements Generator
 	private float $amplitude = 0;
 	private float $velocity;
 
-	private float $triggerOnTime = 0;
+    private float $deltaTime = 0;
 	private float $triggerOffTime = 0;
 
-    public function __construct(
-        Oscillator $generator,
-        Clock      $clock,
-        Shape      $attack,
-        Shape      $decay,
-        Shape      $sustain,
-        Shape      $release
-    ) {
+    public function __construct(Oscillator $generator, Shape $attack, Shape $decay, Shape $sustain, Shape $release)
+    {
         $this->oscillator = $generator;
-        $this->clock = $clock;
         $this->setShape($attack, $decay, $sustain, $release);
     }
 
@@ -55,14 +46,13 @@ class Envelope implements Generator
     public function noteOn(float $velocity): void
     {
         $this->phase = self::PHASE_ATTACK;
-        $this->triggerOnTime = $this->clock->getTime();
         $this->triggerOffTime = 0;
         $this->velocity = $velocity;
     }
 
     public function noteOff(): void
     {
-        $this->triggerOffTime = $this->clock->getTime();
+        $this->triggerOffTime = $this->deltaTime;
         $this->phase = self::PHASE_RELEASE;
         $this->release->setValueFrom($this->amplitude);
     }
@@ -72,21 +62,21 @@ class Envelope implements Generator
         return $this->phase == self::PHASE_OVER;
     }
 
-    public function getValue(): float
+    public function getValue(float $deltaTime): float
     {
-        $deltaTime = $this->clock->getTime() - $this->triggerOnTime;
+        $this->deltaTime += $deltaTime;
 
         switch ($this->phase) {
             case self::PHASE_ATTACK:
-                $this->amplitude = $this->attack->getValue($deltaTime);
-                if ($deltaTime >= $this->attack->getDuration()){
+                $this->amplitude = $this->attack->getValue($this->deltaTime);
+                if ($this->deltaTime >= $this->attack->getDuration()){
                     $this->phase = self::PHASE_DECAY;
                     $this->decay->setValueFrom($this->amplitude);
                 }
                 break;
 
             case self::PHASE_DECAY:
-                $decayDeltaTime = $deltaTime - $this->attack->getDuration();
+                $decayDeltaTime = $this->deltaTime - $this->attack->getDuration();
                 $this->amplitude = $this->decay->getValue($decayDeltaTime);
                 if ($decayDeltaTime >= $this->decay->getDuration()){
                     $this->phase = self::PHASE_SUSTAIN;
@@ -95,11 +85,11 @@ class Envelope implements Generator
                 break;
 
             case self::PHASE_SUSTAIN:
-                $this->amplitude = $this->sustain->getValue($deltaTime);
+                $this->amplitude = $this->sustain->getValue($this->deltaTime);
                 break;
 
             case self::PHASE_RELEASE:
-                $releaseDeltaTime = $this->clock->getTime() - $this->triggerOffTime;
+                $releaseDeltaTime = $this->deltaTime - $this->triggerOffTime;
                 $this->amplitude = $this->release->getValue($releaseDeltaTime);
                 if ($releaseDeltaTime >= $this->release->getDuration()){
                     $this->phase = self::PHASE_OVER;
@@ -107,12 +97,11 @@ class Envelope implements Generator
                 break;
         }
 
-        return $this->oscillator->getValue($deltaTime) * $this->amplitude * $this->velocity;
+        return $this->oscillator->getValue($this->deltaTime) * $this->amplitude * $this->velocity;
     }
 
     public static function linear(
         Oscillator $generator,
-        Clock $clock,
         int $attackDuration,
         int $decayDuration,
         float $sustainAmplitude,
@@ -120,7 +109,6 @@ class Envelope implements Generator
     ): self {
         return new self(
             $generator,
-            $clock,
             new Linear(1, $attackDuration),
             new Linear($sustainAmplitude, $decayDuration),
             new Constant($sustainAmplitude),

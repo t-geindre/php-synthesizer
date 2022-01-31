@@ -27,5 +27,5 @@ $track = new Track(new CyclingInstrument(SWITCH_KEY, DEMO_KEY, [
 $track->append(new DeviceAutoDiscover());
 
 while (!$track->isOver()) {
-    $output->addSample($track->getValue());
+    $output->addSample($track->getValue($clock->getDe()));
 }

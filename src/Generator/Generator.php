@@ -5,5 +5,5 @@ namespace Synthesizer\Generator;
 interface Generator
 {
     public function isOver() : bool;
-    public function getValue() : float;
+    public function getValue(float $deltaTime) : float;
 }

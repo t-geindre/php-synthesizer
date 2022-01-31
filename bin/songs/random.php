@@ -18,8 +18,7 @@ for ($i = 0; $i < 100; $i++) {
     $melodyIndex = min($melodyMaxIndex, max(0 ,$melodyIndex));
 }
 
-/** @var \Synthesizer\Time\Clock\Clock $clock */
-$melodyTrack = Track::withBasicHandler(new Bell($clock), $clock);
+$melodyTrack = Track::withBasicHandler(new Bell());
 $melodyTrack->append(new SequentialClip($melodyPartition));
 
 return [$melodyTrack];

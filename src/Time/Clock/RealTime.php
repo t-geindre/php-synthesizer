@@ -42,4 +42,9 @@ class RealTime implements Clock
     {
         return $this->clock->getTickDuration();
     }
+
+    public function getDeltaTime(): float
+    {
+        return $this->clock->getDeltaTime();
+    }
 }

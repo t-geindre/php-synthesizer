@@ -3,15 +3,14 @@
 namespace Synthesizer\Generator\Instrument;
 
 use Synthesizer\Generator\Envelope;
+use Synthesizer\Generator\Oscillator\Base;
+use Synthesizer\Generator\Oscillator\Oscillator;
 use Synthesizer\Generator\Oscillator\Shape;
+use Synthesizer\Generator\Oscillator\Stack;
 use Synthesizer\Reference\Frequencies;
 use Synthesizer\Shape\Constant;
 use Synthesizer\Shape\Linear;
 use Synthesizer\Shape\Square;
-use Synthesizer\Generator\Oscillator\Base;
-use Synthesizer\Generator\Oscillator\Oscillator;
-use Synthesizer\Generator\Oscillator\Stack;
-use Synthesizer\Time\Clock\Clock;
 
 class Kick extends Instrument
 {
@@ -33,13 +32,10 @@ class Kick extends Instrument
         return $stack;
     }
 
-    protected function getEnvelope(Oscillator $generator, Clock $clock): Envelope
+    protected function getEnvelope(Oscillator $generator): Envelope
     {
         return new Envelope(
             $generator,
-            $clock,
-//            new Constant(1, 1000),
-//            new Constant(1, 100),
             new Linear(1, 2),
             new Square(0, 450),
             new Constant(0),

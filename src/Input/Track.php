@@ -8,11 +8,10 @@ use Synthesizer\Input\Handler\Basic;
 use Synthesizer\Input\Handler\Handler;
 use Synthesizer\Input\Producer\Producer;
 use Synthesizer\Input\Producer\TimedProducer;
-use Synthesizer\Time\Clock\Clock;
 
 class Track implements Generator
 {
-    private Clock $clock;
+    private float $time = 0;
     private float $amplitude;
     private Handler $handler;
     /** @var TimedProducer[] */
@@ -22,18 +21,17 @@ class Track implements Generator
     private int $maxIndex = 0;
     private ?TimedProducer $producer = null;
 
-    public function __construct(Handler $handler, Clock $clock, float $amplitude = 1)
+    public function __construct(Handler $handler, float $amplitude = 1)
     {
-        $this->clock = $clock;
         $this->amplitude = $amplitude;
         $this->handler = $handler;
 
         $this->reset();
     }
 
-    public static function withBasicHandler(Instrument $instrument, Clock $clock, float $amplitude = 1): self
+    public static function withBasicHandler(Instrument $instrument, float $amplitude = 1): self
     {
-        return new self(new Basic($instrument), $clock, $amplitude);
+        return new self(new Basic($instrument), $amplitude);
     }
 
     public function getLength(): int
@@ -102,6 +100,7 @@ class Track implements Generator
 
     public function reset(): void
     {
+        $this->time = 0;
         $this->index = 0;
         $this->producer = null;
     }
@@ -135,18 +134,18 @@ class Track implements Generator
         }
     }
 
-    public function getValue(): float
+    public function getValue(float $deltaTime): float
     {
-        $time = (int) $this->clock->getTime();
+        $this->time += $deltaTime;
 
         if (null !== $this->producer) {
             $this->handler->handleMessages(
-                $this->producer->pullMessages($time - $this->producer->getAt())
+                $this->producer->pullMessages((int) $this->time - $this->producer->getAt())
             );
         }
 
-        $this->updateProducer($time);
+        $this->updateProducer((int) $this->time);
 
-        return $this->handler->getInstrument()->getValue() * $this->amplitude;
+        return $this->handler->getInstrument()->getValue($deltaTime) * $this->amplitude;
     }
 }

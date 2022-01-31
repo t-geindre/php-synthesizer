@@ -6,7 +6,6 @@ use Synthesizer\Generator\Envelope;
 use Synthesizer\Generator\Oscillator\Base;
 use Synthesizer\Generator\Oscillator\Oscillator;
 use Synthesizer\Generator\Oscillator\Stack;
-use Synthesizer\Time\Clock\Clock;
 
 class Organ extends Instrument
 {
@@ -23,8 +22,8 @@ class Organ extends Instrument
         return $stack;
     }
 
-    protected function getEnvelope(Oscillator $generator, Clock $clock): Envelope
+    protected function getEnvelope(Oscillator $generator): Envelope
     {
-        return Envelope::linear($generator, $clock, 50, 500, .6, 200);
+        return Envelope::linear($generator, 50, 500, .6, 200);
     }
 }

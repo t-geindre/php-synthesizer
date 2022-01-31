@@ -36,4 +36,9 @@ class Basic implements Clock
     {
         return $this->tickDuration / 1000;
     }
+
+    public function getDeltaTime(): float
+    {
+        return $this->time === .0 ? .0 : $this->getTickDuration();
+    }
 }

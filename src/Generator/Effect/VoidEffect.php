@@ -18,8 +18,8 @@ class VoidEffect implements Effect
         return $this->generator->isOver();
     }
 
-    public function getValue(): float
+    public function getValue(float $deltaTime): float
     {
-        return $this->generator->getValue();
+        return $this->generator->getValue($deltaTime);
     }
 }

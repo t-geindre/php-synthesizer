@@ -26,9 +26,11 @@ if (!file_exists($songFile = __DIR__.'/songs/'.strtolower($argv[1]).'.php')) {
 
 $output = new Wav();
 $output->setVolume(15);
+
 $clock = new RealTime($output->getClock());
 $clock = $output->getClock();
 $output->setClock($clock);
+
 $automation = new Automation($clock);
 
 $arranger = new Stack();
@@ -40,7 +42,7 @@ array_map(
 try {
     while(!$arranger->isOver() || !$automation->isOver()) {
         $automation->update();
-        $output->addSample($arranger->getValue());
+        $output->addSample($arranger->getValue($clock->getTickDuration()));
     }
 } catch (\InvalidArgumentException $e) {
     error($e->getMessage());

@@ -2,8 +2,6 @@
 use Synthesizer\Input\Track;
 use Synthesizer\Input\Producer\Clip\SequentialClip;
 
-/** @var \Synthesizer\Time\Clock\Clock $clock */
-
 $clip = new SequentialClip([
     [['C4', 300]],
     [['S', 100]],
@@ -39,13 +37,13 @@ $clip = new SequentialClip([
 $tracks = [];
 
 foreach ([
-    new \Synthesizer\Generator\Instrument\Organ($clock),
-    new \Synthesizer\Generator\Instrument\Bell($clock),
-    new \Synthesizer\Generator\Instrument\Kick($clock),
-    new \Synthesizer\Generator\Instrument\MonoBass($clock),
-    new \Synthesizer\Generator\Instrument\PolySynth($clock)
+    new \Synthesizer\Generator\Instrument\Organ(),
+    new \Synthesizer\Generator\Instrument\Bell(),
+    new \Synthesizer\Generator\Instrument\Kick(),
+    new \Synthesizer\Generator\Instrument\MonoBass(),
+    new \Synthesizer\Generator\Instrument\PolySynth()
 ] as $index => $instrument) {
-    $track = Track::withBasicHandler($instrument, $clock);
+    $track = Track::withBasicHandler($instrument);
     $track->addAt(
         $clip->getLength() * $index + ($index > 0 ? 100 : 0),
         clone $clip,

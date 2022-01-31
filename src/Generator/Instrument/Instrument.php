@@ -6,14 +6,11 @@ use Synthesizer\Generator\Effect\VoidEffect;
 use Synthesizer\Generator\Envelope;
 use Synthesizer\Generator\Generator;
 use Synthesizer\Generator\Oscillator\Oscillator;
-use Synthesizer\Reference\Frequencies;
 use Synthesizer\Generator\Stack;
-use Synthesizer\Time\Clock\Clock;
+use Synthesizer\Reference\Frequencies;
 
 abstract class Instrument implements Generator
 {
-    private Clock $clock;
-
     /** @var Envelope[] */
     private array $keysDown = [];
 
@@ -28,15 +25,14 @@ abstract class Instrument implements Generator
 
     const VELOCITY_MAX = 127;
 
-    public function __construct(Clock $clock)
+    public function __construct()
     {
-        $this->clock = $clock;
         $this->generatorsStack = new Stack();
 
-        $this->generator = $this->addEffects($this->generatorsStack, $clock);
+        $this->generator = $this->addEffects($this->generatorsStack);
     }
 
-    public function getValue() : float
+    public function getValue(float $deltaTime) : float
     {
         if (!$this->isSustainOn) {
             foreach ($this->sustainedKeys as $key => $generator) {
@@ -47,7 +43,7 @@ abstract class Instrument implements Generator
 
         $this->generatorsStack->clearOver();
 
-        return $this->generator->getValue();
+        return $this->generator->getValue($deltaTime);
     }
 
     public function isOver() : bool
@@ -71,7 +67,7 @@ abstract class Instrument implements Generator
         }
 
         $generator = $this->getOscillator(Frequencies::FREQUENCIES[$key]);
-        $generator = $this->getEnvelope($generator, $this->clock);
+        $generator = $this->getEnvelope($generator);
         $generator->noteOn($velocity / self::VELOCITY_MAX);
         $this->generatorsStack->push($generator);
 
@@ -114,12 +110,12 @@ abstract class Instrument implements Generator
         }
     }
 
-    protected function getEnvelope(Oscillator $generator, Clock $clock) : Envelope
+    protected function getEnvelope(Oscillator $generator) : Envelope
     {
-        return Envelope::linear($generator, $clock, 100, 100, 1, 100);
+        return Envelope::linear($generator, 100, 100, 1, 100);
     }
 
-    protected function addEffects(Generator $generator, Clock $clock): Effect
+    protected function addEffects(Generator $generator): Effect
     {
         return new VoidEffect($generator);
     }

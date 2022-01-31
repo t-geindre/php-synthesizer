@@ -3,26 +3,24 @@
 namespace Synthesizer\Generator\Effect;
 
 use Synthesizer\Generator\Generator;
-use Synthesizer\Time\Clock\Clock;
 
 class Delay implements Effect
 {
     private Generator $generator;
-    private Clock $clock;
+    private float $time = 0;
     /** @var \SplQueue<float> */
     private \SplQueue $samples;
-    private float $startTime;
+    private float $delay;
     private float $amplitude;
 
-    public function __construct(Generator $generator, Clock $clock, float $delay = .1, float $amplitude = .1)
+    public function __construct(Generator $generator, float $delay = 300, float $amplitude = .1)
     {
         if ($delay < 0) {
             throw new \InvalidArgumentException('Delay must be greater than 0');
         }
 
         $this->generator = $generator;
-        $this->clock = $clock;
-        $this->startTime = $clock->getTime() + $delay;
+        $this->delay = $delay;
         $this->samples = new \SplQueue();
         $this->amplitude = $amplitude;
     }
@@ -32,11 +30,12 @@ class Delay implements Effect
         return $this->generator->isOver();
     }
 
-    public function getValue(): float
+    public function getValue(float $deltaTime): float
     {
-        $value = $this->generator->getValue();
+        $this->time += $deltaTime;
+        $value = $this->generator->getValue($deltaTime);
 
-        if ($this->clock->getTime() >= $this->startTime) {
+        if ($this->time >= $this->delay) {
             $value += $this->samples->dequeue() * $this->amplitude;
         }
 

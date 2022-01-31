@@ -10,16 +10,15 @@ use Synthesizer\Generator\Instrument\PolySynth\Unison;
 use Synthesizer\Generator\Oscillator\Base;
 use Synthesizer\Generator\Oscillator\Oscillator;
 use Synthesizer\Generator\Oscillator\Stack;
-use Synthesizer\Time\Clock\Clock;
 
 class PolySynth extends Instrument
 {
     private Unison $unison;
     private Delay $delay;
 
-    public function __construct(Clock $clock)
+    public function __construct()
     {
-        parent::__construct($clock);
+        parent::__construct();
 
         $this->unison = new Unison();
     }
@@ -45,13 +44,13 @@ class PolySynth extends Instrument
         return $stack;
     }
 
-    protected function getEnvelope(Oscillator $generator, Clock $clock): Envelope
+    protected function getEnvelope(Oscillator $generator): Envelope
     {
-        return Envelope::linear($generator, $clock, 2, 2000, 0, 200);
+        return Envelope::linear($generator, 2, 2000, 0, 200);
     }
 
-    protected function addEffects(Generator $generator, Clock $clock): Effect
+    protected function addEffects(Generator $generator): Effect
     {
-        return $this->delay = new Delay($generator, $clock, 300, .3);
+        return $this->delay = new Delay($generator, 300, .3);
     }
 }

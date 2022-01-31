@@ -27,11 +27,11 @@ class Stack implements Generator
         return true;
     }
 
-    public function getValue(): float
+    public function getValue(float $deltaTime): float
     {
         $value = 0;
         foreach ($this->generators as $generator) {
-            $value += $generator->getValue();
+            $value += $generator->getValue($deltaTime);
         }
 
         return $value;
