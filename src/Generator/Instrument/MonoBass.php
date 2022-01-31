@@ -13,8 +13,8 @@ class MonoBass extends Instrument
     protected function getOscillator(float $frequency): Oscillator
     {
         $stack = new Stack();
-        $stack->push(new Base($frequency, 1, 0, Base::SHAPE_TRIANGLE));
-        $stack->push(new Base($frequency / 2, .4, 1, Base::SHAPE_SAWTOOTH));
+        $stack->push(new Base($frequency, .99, 0, Base::SHAPE_TRIANGLE));
+//        $stack->push(new Base($frequency / 2, .1, 1, Base::SHAPE_SAWTOOTH));
 
         return $stack;
     }

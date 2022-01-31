@@ -1,6 +1,5 @@
 <?php
 
-use Synthesizer\Automation\Task\FadeOut;
 use Synthesizer\Automation\Task\Variator;
 use Synthesizer\Generator\Instrument\Kick;
 use Synthesizer\Generator\Instrument\MonoBass;
@@ -14,69 +13,70 @@ $speed = 50;
 
 // Melody track
 /** @var \Synthesizer\Input\Producer\Clip\Clip $melody */
-$melody = require(__DIR__.'/clips/insomnia/melody.php');
-/** @var \Synthesizer\Input\Producer\Clip\Clip $melodyUp */
-$melodyUp = require(__DIR__.'/clips/insomnia/melody-up.php');
+$melody = require(__DIR__ . '/clips/insomnia/melody-main.php');
 
 $synth = new PolySynth($clock);
 $synth->getUnison()->setDephaseStep(0);
-$synth->getUnison()->setVoices(6);
+$synth->getUnison()->setVoices(2); // TODO PUT IT BACK tO 6 VOICES
 $synth->getDelay()->setAmplitude(.4);
 
 $melodyTrack = Track::withBasicHandler($synth, $clock);
-$melodyTrack->appendAll($melody, $melody, $melodyUp);
+$melodyTrack->append($melody);
 $melodyTrack->appendAllAt(
-    $melodyTrack->getLength() + ($introEnd = 12) * $speed,
-    $melody, $melody, $melodyUp
+    $melodyTrack->getLength() + ($introEnd = 12 * $speed),
+    $melody, $melody
 );
-$melodyTrack->appendAll($melody, $melody, $melodyUp);
 
 /** @var \Synthesizer\Automation\Automation $automation */
 
 /// FadeIn, smooth song attack
+/** @var \Synthesizer\Output\Output $output */
 $automation->addTask(new Variator(
-    0, 800, 0, 1,
-    fn(float $v) => $melodyTrack->setAmplitude($v)
+    0, 800, 0, $output->getVolume(),
+    fn(float $v) => $output->setVolume($v)
 ));
 
 // Intro, tuning synth voices
 $automation->addTask(new Variator(
-    0, $melody->getLength() * 3, .8, 0,
+    0, $melody->getLength(), .8, 0,
     fn(float $v) => $synth->getUnison()->setDetuneStep($v)
 ));
 
 // Intro ends
 $automation->addInline(
-    $end = $melody->getLength() * 3 + $introEnd * $speed,
+    $end = $melody->getLength() + $introEnd,
     $end,
     function () use ($synth) {
         $synth->getUnison()->setVoices(2);
-        $synth->getUnison()->setDetuneStep(1);
-        $synth->getUnison()->setDephaseStep(1);
+        $synth->getUnison()->setDetuneStep(.8);
     }
 );
 
 // Bass
 $accompaniment = require(__DIR__.'/clips/insomnia/accompaniment.php');
 $bassTrack = Track::withBasicHandler(new MonoBass($clock), $clock);
-$bassTrack->addAt($melody->getLength() * 3 + (2 + $introEnd) * $speed, $accompaniment);
-$bassTrack->appendAll($accompaniment, $accompaniment);
-$bassTrack->appendAll($accompaniment, $accompaniment, $accompaniment);
+$bassTrack->addAt($melody->getLength() + 2 * $speed + $introEnd, $accompaniment);
+$bassTrack->appendAll($accompaniment);
 
 // Kicks
 $kicks = require(__DIR__.'/clips/insomnia/kicks.php');
 $kicksTrack = Track::withBasicHandler(new Kick($clock), $clock, 2.5);
-$kicksTrack->addAt($melody->getLength() * 3 + (2 + $introEnd) * $speed, $kicks);
-$kicksTrack->appendAll($kicks, $kicks);
-$kicksTrack->appendAll($kicks, $kicks, $kicks);
+$kicksTrack->addAt($melody->getLength() + 2 * $speed + $introEnd, $kicks);
+$kicksTrack->appendAll($kicks);
 
-// Bass
+// All tracks together
+$tracks = [$melodyTrack, $kicksTrack, $bassTrack];
+
+// Compute whole song length
+$length = 0;
+array_map(function(Track $track) use (&$length) {
+    $length = $track->getLength() > $length ? $track->getLength() : $length;
+}, $tracks);
 
 // Fade out
-/** @var \Synthesizer\Output\Output $output */
 $automation->addTask(new Variator(
-    $melodyTrack->getLength() - 1000, $melodyTrack->getLength(), $output->getVolume(), 0,
+    $length - 1000, $length, $output->getVolume(), 0,
     fn (float $v) => $output->setVolume((int) $v)
 ));
 
-return [$melodyTrack, $kicksTrack, $bassTrack];
+return $tracks;

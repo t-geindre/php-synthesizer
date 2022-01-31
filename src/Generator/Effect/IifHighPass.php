@@ -1,10 +1,10 @@
 <?php
 
-namespace Synthesizer\Generator\Oscillator\Filter;
+namespace Synthesizer\Generator\Effect;
 
 use Synthesizer\Generator\Oscillator\Oscillator;
 
-class IifLowPass implements Oscillator
+class IifHighPass implements Oscillator
 {
     private Oscillator $oscillator;
     private float $lastValue = 0;
@@ -18,10 +18,10 @@ class IifLowPass implements Oscillator
 
     public function getValue(float $deltaTime): float
     {
-        // y[i] := y[i-1] + α * (x[i] - y[i-1])
         return $this->lastValue =
-            $this->lastValue +
-            $this->cutOff * ($this->oscillator->getValue($deltaTime) - $this->lastValue)
+            (1 - $this->cutOff) *
+            $this->lastValue + $this->cutOff *
+            $this->oscillator->getValue($deltaTime)
         ;
     }
 

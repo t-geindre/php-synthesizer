@@ -20,7 +20,7 @@ class Kick extends Instrument
         $frequency = Frequencies::FREQUENCIES['F1'];
 
         $stack = new Stack();
-        $lfo = new Shape(.15, new Square(0, 200));
+        $lfo = new Shape(.25, new Square(0, 180));
 
         $osc = new Base($frequency, .99, 0, Base::SHAPE_SINUSOIDAL);
         $osc->setLfo($lfo);

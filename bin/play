@@ -6,6 +6,7 @@ use Synthesizer\Automation\Automation;
 use Synthesizer\Generator\Stack;
 use Synthesizer\Input\Track;
 use Synthesizer\Output\Wav;
+use Synthesizer\Time\Clock\RealTime;
 
 function error($msg) : void
 {
@@ -24,7 +25,10 @@ if (!file_exists($songFile = __DIR__.'/songs/'.strtolower($argv[1]).'.php')) {
 }
 
 $output = new Wav();
+$output->setVolume(15);
+$clock = new RealTime($output->getClock());
 $clock = $output->getClock();
+$output->setClock($clock);
 $automation = new Automation($clock);
 
 $arranger = new Stack();
